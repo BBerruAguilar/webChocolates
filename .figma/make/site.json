@@ -1,0 +1,12 @@
+{
+  "title": "Wayu Chocolates · Choco Mikhuna",
+  "description": "Chocolates artesanales del grano a la barra, hechos en Tingo María, Perú. Haz tu pedido por WhatsApp.",
+  "language": "es",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

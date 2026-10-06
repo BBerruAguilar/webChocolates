@@ -1,0 +1,2664 @@
+﻿===== PROJECT CONTEXT DUMP =====
+Generado: 10/04/2026 17:50:20
+
+===== ESTRUCTURA =====
+AGENTS.md
+CLAUDE.md
+index.html
+package.json
+tsconfig.json
+vite.config.ts
+.figma\make\dev.json
+.figma\make\site.json
+src\App.tsx
+src\index.css
+src\main.tsx
+src\vite-env.d.ts
+
+===== CODIGO =====
+
+==== AGENTS.md ====
+# figma-make-app
+
+React + Vite + Tailwind CSS project running inside Figma Make.
+
+## Development Server
+
+A Vite development server is **already running** on `$PORT` (default 8443). You don't need to start it manually.
+
+- Preview URL: The user can access the running app through the preview panel
+- Hot reload: Changes to source files are reflected immediately
+
+## Project Structure
+
+This is the canonical project structure. Start with task-relevant files below. Only follow imports or inspect other files when required, when a documented path is missing, or when the repository contradicts this guide.
+
+- `src/main.tsx` - React entrypoint; imports `src/index.css` and mounts `src/App.tsx` into the `#root` element
+- `src/App.tsx` - Primary application component and the usual starting point for UI work
+- `src/index.css` - Global CSS entrypoint and Tailwind CSS v4 import
+- `index.html` - Vite HTML shell containing the `#root` element and loading `src/main.tsx`
+- `package.json` - Project dependencies and the Vite build, development, preview, and formatting scripts
+- `vite.config.ts` - Vite configuration with React, Tailwind CSS v4, and Figma Make plugins plus the `@` alias for `src`
+- `.mise.toml` - Toolchain versions for Node.js and pnpm
+
+## Dependencies
+
+- Runtime: React 19 and React DOM 19
+- Styling: Tailwind CSS v4 with the `@tailwindcss/vite` plugin
+- Build tooling: Vite 8, TypeScript 5.7, and `@vitejs/plugin-react`
+- Formatting: oxfmt
+
+## Styling
+
+This project uses **Tailwind CSS v4** through the `@tailwindcss/vite` plugin configured in `vite.config.ts`. `src/index.css` imports Tailwind with `@import 'tailwindcss';`. Use Tailwind utility classes directly in JSX and put global CSS or Tailwind v4 theme customization in `src/index.css`. This scaffold does not need a Tailwind config file or PostCSS config.
+
+`src/main.tsx` imports `src/index.css`, so global font wiring belongs in `src/index.css`. Keep CSS `@import` statements first, then add any `@font-face` rules and font-family defaults there.
+
+
+==== CLAUDE.md ====
+@AGENTS.md
+
+
+==== index.html ====
+<!doctype html>
+<html lang="<!-- figma:lang -->">
+  <head>
+    <!-- figma:head-start -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><!-- figma:title --></title>
+    <!-- figma:head-end -->
+  </head>
+  <body>
+    <!-- figma:body-start -->
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <!-- figma:body-end -->
+  </body>
+</html>
+
+
+==== package.json ====
+{
+  "name": "figma-make-app",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "format": "oxfmt"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.0",
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "oxfmt": "^0.2.0",
+    "typescript": "^5.7.0",
+    "vite": "^8.0.5"
+  }
+}
+
+
+==== tsconfig.json ====
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": ["node"],
+    "strict": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src", "vite.config.ts"]
+}
+
+
+==== vite.config.ts ====
+import { defineConfig, type HtmlTagDescriptor, type Plugin } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import path from 'node:path'
+
+import siteConfiguration from './.figma/make/site.json'
+
+
+// Vite config — https://vitejs.dev/config/
+export default defineConfig(({ mode }) => {
+  // .figma/make/deploy-preview passes `--mode development` for cached-preview builds.
+  const emitSourcemaps = mode === 'development'
+
+  return {
+    base: process.env.FIGMA_PUBLIC_URL ? `${process.env.FIGMA_PUBLIC_URL}/` : '/',
+    build: {
+      sourcemap: emitSourcemaps ? 'inline' : false,
+      minify: !emitSourcemaps,
+    },
+    plugins: [
+react(),
+      tailwindcss(),
+      figmaSiteConfiguration(siteConfiguration),
+      figmaErrorOverlayReplay(),
+      figmaReactRefreshBoundaryFallback(),
+      figmaMakeKitPlugin({ storiesGlob: '/src/**/*.stories.{ts,tsx,js,jsx}' }),
+    ],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
+    },
+    server: {
+      host: process.env.FIGMA_DEV_SERVER_HOST || '0.0.0.0',
+      port: parseInt(process.env.PORT || '8443'),
+      strictPort: true,
+      watch: {
+        ignored: [
+          '**/.figma/**',
+],
+      },
+    },
+    preview: {
+      host: process.env.FIGMA_DEV_SERVER_HOST || '0.0.0.0',
+      port: parseInt(process.env.PORT || '8443'),
+    },
+  }
+})
+
+type FigmaSiteConfiguration = {
+  title?: string
+  description?: string
+  language?: string
+  robots?: {
+    index?: boolean
+  }
+  icons?: {
+    icon?: string
+  }
+  openGraph?: {
+    image?: string
+  }
+  analytics?: {
+    googleAnalyticsId?: string
+  }
+  customScripts?: {
+    headStart?: string
+    headEnd?: string
+    bodyStart?: string
+    bodyEnd?: string
+  }
+  accessibility?: {
+    addBypassLinks?: boolean
+  }
+}
+
+/** Applies /.figma/make/site.json to the generated document shell. */
+function figmaSiteConfiguration(config: FigmaSiteConfiguration): Plugin {
+  function sanitizeHtmlValue(value: string | undefined): string {
+    return value?.replace(/[^a-zA-Z0-9_-]/g, '') || ''
+  }
+  function escapeHtmlText(value: string): string {
+    return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  }
+  function replaceHtmlCommentSlot(html: string, slotName: string, content: string): string {
+    return html.replace(`<!-- ${slotName} -->`, content)
+  }
+
+  const title = config.title ?? "Figma Make App"
+  const description = config.description ?? ''
+  const favicon = config.icons?.icon ?? ''
+  const socialImage = config.openGraph?.image ?? ''
+  const language = sanitizeHtmlValue(config.language) || 'en'
+  const googleAnalyticsId = sanitizeHtmlValue(config.analytics?.googleAnalyticsId)
+  const headStart = config.customScripts?.headStart ?? ''
+  const headEnd = config.customScripts?.headEnd ?? ''
+  const bodyStart = config.customScripts?.bodyStart ?? ''
+  const bodyEnd = config.customScripts?.bodyEnd ?? ''
+  const robotsTxt = config.robots?.index === false ? 'User-agent: *\nDisallow: /\n' : ''
+
+  return {
+    name: 'figma-site-configuration',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (!robotsTxt || req.url?.split('?')[0] !== '/robots.txt') return next()
+
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+        res.end(robotsTxt)
+      })
+    },
+    generateBundle() {
+      if (!robotsTxt) return
+
+      this.emitFile({
+        type: 'asset',
+        fileName: 'robots.txt',
+        source: robotsTxt,
+      })
+    },
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html) {
+        let result = html
+        result = replaceHtmlCommentSlot(result, 'figma:lang', language)
+        result = replaceHtmlCommentSlot(result, 'figma:title', escapeHtmlText(title))
+        result = replaceHtmlCommentSlot(result, 'figma:head-start', headStart)
+        result = replaceHtmlCommentSlot(result, 'figma:head-end', headEnd)
+        result = replaceHtmlCommentSlot(result, 'figma:body-start', bodyStart)
+        result = replaceHtmlCommentSlot(result, 'figma:body-end', bodyEnd)
+
+        const tags: HtmlTagDescriptor[] = []
+        if (description) {
+          tags.push({ tag: 'meta', attrs: { name: 'description', content: description }, injectTo: 'head' })
+        }
+        if (config.robots?.index === false) {
+          tags.push({ tag: 'meta', attrs: { name: 'robots', content: 'noindex, nofollow' }, injectTo: 'head' })
+        }
+        if (favicon) {
+          tags.push({ tag: 'link', attrs: { rel: 'icon', href: favicon }, injectTo: 'head' })
+        }
+        if (title) {
+          tags.push({ tag: 'meta', attrs: { property: 'og:title', content: title }, injectTo: 'head' })
+        }
+        if (description) {
+          tags.push({ tag: 'meta', attrs: { property: 'og:description', content: description }, injectTo: 'head' })
+        }
+        if (socialImage) {
+          tags.push(
+            { tag: 'meta', attrs: { property: 'og:image', content: socialImage }, injectTo: 'head' },
+            { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' }, injectTo: 'head' },
+            { tag: 'meta', attrs: { name: 'twitter:image', content: socialImage }, injectTo: 'head' },
+          )
+        }
+
+        if (googleAnalyticsId) {
+          tags.push(
+            {
+              tag: 'script',
+              attrs: {
+                async: true,
+                src: `https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`,
+              },
+              injectTo: 'head',
+            },
+            {
+              tag: 'script',
+              children: `
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', ${JSON.stringify(googleAnalyticsId)});
+`,
+              injectTo: 'head',
+            },
+          )
+        }
+
+        if (config.accessibility?.addBypassLinks) {
+          tags.push(
+            {
+              tag: 'style',
+              children: `
+  .figma-bypass-link {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 2147483647;
+    transform: translateY(-150%);
+    border-radius: 6px;
+    background: #111827;
+    color: #fff;
+    padding: 8px 12px;
+    font: 600 14px/1.2 system-ui, sans-serif;
+    text-decoration: none;
+  }
+  .figma-bypass-link:focus {
+    transform: translateY(0);
+  }
+`,
+              injectTo: 'head',
+            },
+            {
+              tag: 'a',
+              attrs: { class: 'figma-bypass-link', href: '#root' },
+              children: 'Skip to content',
+              injectTo: 'body-prepend',
+            },
+          )
+        }
+
+        return {
+          html: result,
+          tags,
+        }
+      },
+    },
+  }
+}
+
+/**
+ * Replay the most recent build error to clients that connect after
+ * it was first broadcast. Vite buffers an error payload only while
+ * no clients are connected and clears the buffer on the first
+ * reconnect (see `bufferedMessage` in `createWebSocketServer`), so
+ * if the preview iframe reloads after Vite already delivered an
+ * error to a live socket, the new socket misses the payload and
+ * the overlay stays hidden even though the build is still broken.
+ * We intercept `ws.send` to remember the latest error and replay
+ * it on every new connection; the cache clears on a successful
+ * `update` or `full-reload` so a stale overlay can't survive a
+ * fixed build.
+ */
+function figmaErrorOverlayReplay(): Plugin {
+  return {
+    name: 'figma-error-overlay-replay',
+    apply: 'serve',
+    configureServer(server) {
+      let lastError: object | null = null
+
+      const origSend = server.ws.send.bind(server.ws) as (...args: any[]) => void
+      server.ws.send = ((...args: any[]) => {
+        const payload = args[0]
+        if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+          const type = (payload as { type?: string }).type
+          if (type === 'error') {
+            lastError = payload as object
+          } else if (type === 'update' || type === 'full-reload') {
+            lastError = null
+          }
+        }
+        return origSend(...args)
+      }) as typeof server.ws.send
+
+      server.ws.on('connection', (socket) => {
+        if (lastError !== null) {
+          socket.send(JSON.stringify(lastError))
+        }
+      })
+    },
+  }
+}
+
+/**
+ * Reload when a module that previously defined a React Refresh boundary stops
+ * defining one. This happens when an agent moves a component into a new file
+ * and replaces the old module with a re-export:
+ *
+ *   export { default } from './app/App'
+ *
+ * Vite otherwise accepts the update using the previous module's HMR boundary,
+ * but the re-export-only transform no longer registers a replacement for the
+ * mounted component family. React reports a successful refresh while leaving
+ * the old tree mounted until the page is reloaded.
+ */
+function figmaReactRefreshBoundaryFallback(): Plugin {
+  const hadRefreshBoundary = new Map<string, boolean>()
+  let sendFullReload: (() => void) | null = null
+
+  return {
+    name: 'figma-react-refresh-boundary-fallback',
+    apply: 'serve',
+    enforce: 'post',
+    configureServer(server) {
+      sendFullReload = () => server.ws.send({ type: 'full-reload', path: '*' })
+    },
+    transform(code, id) {
+      if (!/\.[jt]sx?(?:\?|$)/.test(id) || id.includes('/node_modules/')) return null
+
+      const moduleId = id.split('?')[0] ?? id
+      const hasRefreshBoundary = code.includes('registerExportsForReactRefresh')
+      const previousHadRefreshBoundary = hadRefreshBoundary.get(moduleId)
+      hadRefreshBoundary.set(moduleId, hasRefreshBoundary)
+
+      if (previousHadRefreshBoundary && !hasRefreshBoundary) {
+        queueMicrotask(() => sendFullReload?.())
+      }
+
+      return null
+    },
+  }
+}
+
+/**
+ * Serves a blank render-target page at /.figma/make/kit.html that
+ * the Figma preview script drives directly. The page exposes a
+ * registry of every file matching `storiesGlob` on
+ * window.__FIGMA__.stories so the design surface can dynamically
+ * import + mount each entry into its own grid view.
+ *
+ * Dev-only: `apply: 'serve'` gates the plugin to `vite dev`. Prod
+ * builds (`vite build`) skip it entirely so the route doesn't leak
+ * into shipped bundles.
+ */
+function figmaMakeKitPlugin(options: { storiesGlob: string | string[] }): Plugin {
+  const storiesGlob = Array.isArray(options.storiesGlob) ? options.storiesGlob : [options.storiesGlob]
+  const ROUTE = '/.figma/make/kit.html'
+  const VIRTUAL_ID = 'virtual:figma-stories'
+  const RESOLVED_ID = '\0' + VIRTUAL_ID
+  const STORIES_MODULE = `export const stories = import.meta.glob(${JSON.stringify(storiesGlob)})`
+  const HTML_BOOTSTRAP = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+<div id="figma-make-kit-root"></div>
+<script type="module">
+  import { stories } from 'virtual:figma-stories'
+  window.__FIGMA__ = Object.assign(window.__FIGMA__ ?? {}, { stories })
+  window.dispatchEvent(new CustomEvent('figma.ready'))
+</script>
+</body>
+</html>`
+
+  return {
+    name: 'figma-make-kit',
+    apply: 'serve',
+    resolveId(id) {
+      if (id === VIRTUAL_ID) return RESOLVED_ID
+      return null
+    },
+    load(id) {
+      if (id !== RESOLVED_ID) return null
+      return STORIES_MODULE
+    },
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        const url = req.url || ''
+        if (url.split('?')[0] !== ROUTE) return next()
+
+        try {
+          res.setHeader('Content-Type', 'text/html')
+          res.end(await server.transformIndexHtml(url, HTML_BOOTSTRAP))
+        } catch (err) {
+          next(err as Error)
+        }
+      })
+    },
+  }
+}
+
+
+==== .figma\make\dev.json ====
+{
+  // Files whose changes trigger the install script + dev server restart.
+  // Glob syntax: doublestar (supports **, *, ?, [abc], {a,b}). Paths are
+  // repo-relative and case-sensitive. `.mise.toml` and the scripts under
+  // `.figma/make/` are always watched regardless of these lists.
+  //
+  // Each key accepts a shorthand array of globs:
+  //   "installOn": ["package.json"]
+  // or an object with includes/excludes:
+  //   "installOn": { "includes": ["**/*.json"], "excludes": ["test/**"] }
+  //
+  // Only list files that affect the *toolchain or dependency tree* here —
+  // NOT application source files. Vite's dev server already watches
+  // application code (src/**/*) and config (vite.config.ts) via its own HMR
+  // pipeline, so including them here would cause a redundant full restart.
+  "installOn": [
+    "package.json",
+    "pnpm-lock.yaml"
+  ],
+  // Files whose changes trigger only a dev server restart (no install).
+  "restartOn": []
+}
+
+
+==== .figma\make\site.json ====
+{
+  "description": "Enhance product images effortlessly to improve visual appeal and boost sales with easy-to-use editing tools designed for sellers and marketers.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
+
+==== src\App.tsx ====
+import { useEffect, useRef, useState, type TouchEvent } from 'react'
+
+// Existing images
+import imgWayuLeche40Box from '@/imports/WhatsApp_Image_2026-09-26_at_15.29.11.jpeg'
+import imgChocoMikhunaBars from '@/imports/WhatsApp_Image_2026-09-27_at_15.12.11-1.jpeg'
+import imgChocoMikhunaPeq from '@/imports/WhatsApp_Image_2026-09-27_at_15.46.51.jpeg'
+import imgWayuBitter75 from '@/imports/WhatsApp_Image_2026-09-27_at_14.58.29.jpeg'
+
+// New images
+import imgMikhunaCremaManiVenado from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.43.jpeg'
+import imgMikhunaBitterAguaymanto from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.42__1_.jpeg'
+import imgMikhunaCafe from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.42.jpeg'
+import imgMikhunaBitterAguaymantoFabric from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.41__2_.jpeg'
+import imgMikhunasManiSplash from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.41__1_.jpeg'
+import imgMikhunaMono from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.41.jpeg'
+import imgGrageasAguaymanto from '@/imports/WhatsApp_Image_2026-09-26_at_15.17.08.jpeg'
+import imgGrageasArandanoNueva from '@/imports/WhatsApp_Image_2026-09-26_at_15.16.42.jpeg'
+import imgGrageasFresa from '@/imports/WhatsApp_Image_2026-09-26_at_15.16.11.jpeg'
+import imgGrageasMango from '@/imports/WhatsApp_Image_2026-09-26_at_15.15.31.jpeg'
+import imgGrageasPina from '@/imports/WhatsApp_Image_2026-09-26_at_15.15.00.jpeg'
+import imgGrageasPasas from '@/imports/WhatsApp_Image_2026-09-26_at_15.14.33.jpeg'
+import imgMiniTabletasWayu from '@/imports/WhatsApp_Image_2026-09-27_at_15.12.11.jpeg'
+import imgColeccionGrageas from '@/imports/WhatsApp_Image_2026-09-26_at_15.07.54__2_.jpeg'
+import imgCascarillaMikhuna from '@/imports/WhatsApp_Image_2026-09-26_at_15.07.54__1_.jpeg'
+import imgCacaoPolvo from '@/imports/WhatsApp_Image_2026-09-26_at_15.07.54.jpeg'
+import imgMikhunaCaja30 from '@/imports/choco-mikhuna-caja-30gr.png'
+import imgMikhunaCafeLeche60 from '@/imports/choco-mikhuna-cafe-leche-60.png'
+import imgMikhunaColeccion60 from '@/imports/choco-mikhuna-coleccion-60.png'
+
+type HeroSlide = {
+  image: string
+  alt: string
+  brand: string
+  title: string
+  position: string
+  contact?: string
+}
+
+type Product = {
+  id: number
+  brand: 'Wayu Chocolates' | 'Choco Mikhuna'
+  name: string
+  subtitle: string
+  price: string
+  origin: string
+  description: string
+  tags: string[]
+  image: string
+  cardBg: string
+  spotColor: string
+  accentColor: string
+  vignetteColor: string | null   // null = image already has nice bg, no vignette
+  imgPosition: string
+}
+
+const products: Product[] = [
+  // ── WAYU ──────────────────────────────────────────────────────
+  {
+    id: 2,
+    brand: 'Wayu Chocolates',
+    name: 'Grageas con Arándano',
+    subtitle: '60% Cacao · Tingo María',
+    price: 'S/. 16.50',
+    origin: 'Tingo María · Perú',
+    description: 'Arándanos frescos cubiertos en chocolate 60% cacao fino de aroma. Explosión de sabor agridulce.',
+    tags: ['60% Cacao', 'Arándano', 'Antioxidante'],
+    image: imgGrageasArandanoNueva,
+    cardBg: 'linear-gradient(135deg, #0c0a1f 0%, #1a1540 100%)',
+    spotColor: 'rgba(100,100,255,0.25)',
+    accentColor: '#9fa8da',
+    vignetteColor: '#0c0a1f',
+    imgPosition: 'center 50%',
+  },
+  {
+    id: 3,
+    brand: 'Wayu Chocolates',
+    name: 'Chocolate con Leche',
+    subtitle: '40% Cacao · Caja 80 gr',
+    price: 'S/. 15.00',
+    origin: 'Tingo María · Perú',
+    description: 'Chocolate con leche 40% cacao fino de aroma. Elaborado artesanalmente del grano a la barra. Notas dulces y equilibradas.',
+    tags: ['40% Cacao', '80 gr', 'Del grano a la barra'],
+    image: imgWayuLeche40Box,
+    cardBg: 'linear-gradient(135deg, #1a0a10 0%, #2d1020 100%)',
+    spotColor: 'rgba(255,100,160,0.18)',
+    accentColor: '#f48fb1',
+    vignetteColor: '#1a0a10',
+    imgPosition: 'center center',
+  },
+  {
+    id: 5,
+    brand: 'Wayu Chocolates',
+    name: 'Chocolate Bitter Cítrico',
+    subtitle: '75% Cacao · Arándano · 80 gr',
+    price: 'S/. 15.00',
+    origin: 'Tingo María · Perú',
+    description: 'Intenso chocolate oscuro 75% cacao con notas cítricas y arándano. Para los amantes del chocolate puro.',
+    tags: ['75% Cacao', 'Arándano', 'Bitter'],
+    image: imgWayuBitter75,
+    cardBg: 'linear-gradient(135deg, #0d0a1a 0%, #1a1438 100%)',
+    spotColor: 'rgba(140,100,255,0.18)',
+    accentColor: '#b39ddb',
+    vignetteColor: '#0d0a1a',
+    imgPosition: 'center 30%',
+  },
+  // ── CHOCO MIKHUNA ─────────────────────────────────────────────
+  {
+    id: 8,
+    brand: 'Choco Mikhuna',
+    name: 'Chocolate con Leche · Crema de Maní',
+    subtitle: '60% Cacao · Venado Rojo · 80 gr',
+    price: 'S/. 15.00',
+    origin: 'Tingo María · Perú',
+    description: 'La combinación perfecta de chocolate con leche 60% y crema de maní. Ilustrado con el Venado Rojo entre flores silvestres.',
+    tags: ['60% Cacao', 'Crema Maní', '80 gr'],
+    image: imgMikhunaCremaManiVenado,
+    cardBg: 'linear-gradient(135deg, #1a1205 0%, #2e2010 100%)',
+    spotColor: 'rgba(220,180,80,0.15)',
+    accentColor: '#ffe082',
+    vignetteColor: null,
+    imgPosition: 'center center',
+  },
+  {
+    id: 9,
+    brand: 'Choco Mikhuna',
+    name: 'Chocolate Bitter · Aguaymanto',
+    subtitle: '75% Cacao · 80 gr',
+    price: 'S/. 15.00',
+    origin: 'Tingo María · Perú',
+    description: 'Cacao intenso al 75% con el toque exótico del aguaymanto. Un placer único que mezcla lo amargo con lo tropical.',
+    tags: ['75% Cacao', 'Aguaymanto', 'Bitter'],
+    image: imgMikhunaBitterAguaymanto,
+    cardBg: 'linear-gradient(135deg, #1f0d00 0%, #3d1e00 100%)',
+    spotColor: 'rgba(255,160,20,0.2)',
+    accentColor: '#ffb74d',
+    vignetteColor: null,
+    imgPosition: 'center center',
+  },
+  {
+    id: 10,
+    brand: 'Choco Mikhuna',
+    name: 'Chocolate con Leche · Café',
+    subtitle: '60% Cacao · Perezoso · 80 gr',
+    price: 'S/. 15.00',
+    origin: 'Tingo María · Perú',
+    description: 'Chocolate con leche 60% con granos de café de la selva. El simpático Perezoso de Tres Dedos da la bienvenida en cada caja.',
+    tags: ['60% Cacao', 'Café', '80 gr'],
+    image: imgMikhunaCafe,
+    cardBg: 'linear-gradient(135deg, #150a00 0%, #2e1800 100%)',
+    spotColor: 'rgba(180,120,40,0.2)',
+    accentColor: '#d4a24a',
+    vignetteColor: null,
+    imgPosition: 'center center',
+  },
+  {
+    id: 11,
+    brand: 'Choco Mikhuna',
+    name: 'Chocolate Bitter · Aguaymanto',
+    subtitle: '75% Cacao · Edición Dorada · 80 gr',
+    price: 'S/. 15.00',
+    origin: 'Tingo María · Perú',
+    description: '"Cacao intenso al 75% con el toque exótico del aguaymanto. Un placer único." Presentación especial edición dorada.',
+    tags: ['75% Cacao', 'Aguaymanto', 'Edición Especial'],
+    image: imgMikhunaBitterAguaymantoFabric,
+    cardBg: 'linear-gradient(135deg, #1f1200 0%, #3d2600 100%)',
+    spotColor: 'rgba(220,170,30,0.2)',
+    accentColor: '#ffd54f',
+    vignetteColor: null,
+    imgPosition: 'center center',
+  },
+  {
+    id: 12,
+    brand: 'Choco Mikhuna',
+    name: 'Chocolate con Leche · Maní',
+    subtitle: '60% Cacao · Edición Splash · 80 gr',
+    price: 'S/. 15.00',
+    origin: 'Tingo María · Perú',
+    description: '¡El placer del chocolate se une a la delicia del maní! Presentación con splash de chocolate. Gallito de las Rocas.',
+    tags: ['60% Cacao', 'Maní', 'Edición Especial'],
+    image: imgMikhunasManiSplash,
+    cardBg: 'linear-gradient(135deg, #1a0800 0%, #3a1500 100%)',
+    spotColor: 'rgba(200,100,30,0.2)',
+    accentColor: '#ff8a65',
+    vignetteColor: null,
+    imgPosition: 'center center',
+  },
+  {
+    id: 13,
+    brand: 'Choco Mikhuna',
+    name: 'Chocolate con Leche · 50% Cacao',
+    subtitle: 'Mono Ardilla · 80 gr',
+    price: 'S/. 15.00',
+    origin: 'Tingo María · Perú',
+    description: 'Chocolate con leche 50% cacao fino de aroma. El adorable Mono Ardilla de la Amazonía peruana es el protagonista de este sabor.',
+    tags: ['50% Cacao', 'Leche', '80 gr'],
+    image: imgMikhunaMono,
+    cardBg: 'linear-gradient(135deg, #061525 0%, #0a2540 100%)',
+    spotColor: 'rgba(60,160,220,0.2)',
+    accentColor: '#80deea',
+    vignetteColor: null,
+    imgPosition: 'center center',
+  },
+  {
+    id: 25,
+    brand: 'Choco Mikhuna',
+    name: 'Caja de Chocolate · Sabores Variados',
+    subtitle: 'Chocolate con leche · Caja 30 gr',
+    price: 'S/. 6.00',
+    origin: 'Tingo María · Perú',
+    description: 'Caja individual de chocolate artesanal en diferentes sabores, entre ellos café, crema de maní y maní.',
+    tags: ['Sabores Variados', '30 gr', 'Artesanal'],
+    image: imgMikhunaCaja30,
+    cardBg: 'linear-gradient(135deg, #24120a 0%, #4a2715 100%)',
+    spotColor: 'rgba(230,160,90,0.2)',
+    accentColor: '#e0ad72',
+    vignetteColor: null,
+    imgPosition: 'center center',
+  },
+  {
+    id: 15,
+    brand: 'Wayu Chocolates',
+    name: 'Chocolate Blanco · 9 Sabores',
+    subtitle: '30 gr · Del grano a la barra',
+    price: 'S/. 6.50',
+    origin: 'Del grano a la barra · Artesanal',
+    description: 'Chocolate blanco artesanal en 9 sabores: café, nibs, maní, ajonjolí, piña, aguaymanto, arándano, limón y fresa.',
+    tags: ['9 Sabores', 'Blanco', '30 gr', 'Artesanal'],
+    image: imgChocoMikhunaBars,
+    cardBg: 'linear-gradient(135deg, #1c1508 0%, #2e2210 100%)',
+    spotColor: 'rgba(220,180,80,0.15)',
+    accentColor: '#e6c84a',
+    vignetteColor: '#1c1508',
+    imgPosition: 'center 20%',
+  },
+  {
+    id: 16,
+    brand: 'Choco Mikhuna',
+    name: 'Choco Arcah · Mini Tableta',
+    subtitle: '60% Cacao · 10 gr',
+    price: 'S/. 2.00',
+    origin: 'Tingo María · Perú',
+    description: 'Mini tableta de chocolate con leche 60% cacao, presentada en una práctica bolsita individual de 10 gramos.',
+    tags: ['60% Cacao', 'Mini Tableta', '10 gr'],
+    image: imgChocoMikhunaPeq,
+    cardBg: 'linear-gradient(135deg, #071a08 0%, #0f2e10 100%)',
+    spotColor: 'rgba(100,200,80,0.12)',
+    accentColor: '#81c784',
+    vignetteColor: '#071a08',
+    imgPosition: 'center 40%',
+  },
+  {
+    id: 17,
+    brand: 'Wayu Chocolates',
+    name: 'Grageas con Aguaymanto',
+    subtitle: '60% Cacao · Fruta tropical',
+    price: 'S/. 16.50',
+    origin: 'Tingo María · Perú',
+    description: 'Aguaymanto cubierto con chocolate 60% cacao. Una combinación vibrante, frutal y ligeramente ácida.',
+    tags: ['60% Cacao', 'Aguaymanto', 'Natural'],
+    image: imgGrageasAguaymanto,
+    cardBg: 'linear-gradient(135deg, #291306 0%, #542408 100%)',
+    spotColor: 'rgba(255,170,45,0.24)',
+    accentColor: '#f1a24c',
+    vignetteColor: '#291306',
+    imgPosition: 'center 48%',
+  },
+  {
+    id: 18,
+    brand: 'Wayu Chocolates',
+    name: 'Grageas con Fresa',
+    subtitle: '60% Cacao · Fruta deshidratada',
+    price: 'S/. 16.50',
+    origin: 'Tingo María · Perú',
+    description: 'Fresa frutal cubierta con chocolate artesanal al 60%. Dulce, fresca y perfecta para compartir.',
+    tags: ['60% Cacao', 'Fresa', 'Artesanal'],
+    image: imgGrageasFresa,
+    cardBg: 'linear-gradient(135deg, #280809 0%, #521416 100%)',
+    spotColor: 'rgba(240,100,105,0.22)',
+    accentColor: '#ef8b86',
+    vignetteColor: '#280809',
+    imgPosition: 'center 45%',
+  },
+  {
+    id: 19,
+    brand: 'Wayu Chocolates',
+    name: 'Grageas con Mango',
+    subtitle: '60% Cacao · Fruta tropical',
+    price: 'S/. 16.50',
+    origin: 'Tingo María · Perú',
+    description: 'Mango tropical cubierto con chocolate 60% cacao fino de aroma. Suave, jugoso y naturalmente peruano.',
+    tags: ['60% Cacao', 'Mango', 'Tropical'],
+    image: imgGrageasMango,
+    cardBg: 'linear-gradient(135deg, #241403 0%, #493006 100%)',
+    spotColor: 'rgba(245,187,55,0.22)',
+    accentColor: '#e9b94e',
+    vignetteColor: '#241403',
+    imgPosition: 'center 46%',
+  },
+  {
+    id: 20,
+    brand: 'Wayu Chocolates',
+    name: 'Grageas con Piña',
+    subtitle: '60% Cacao · Fruta tropical',
+    price: 'S/. 16.50',
+    origin: 'Tingo María · Perú',
+    description: 'Piña tropical bañada en chocolate 60% cacao. Un contraste luminoso entre dulzor, acidez y cacao.',
+    tags: ['60% Cacao', 'Piña', 'Tropical'],
+    image: imgGrageasPina,
+    cardBg: 'linear-gradient(135deg, #102009 0%, #203c0e 100%)',
+    spotColor: 'rgba(135,205,70,0.2)',
+    accentColor: '#a8cf6a',
+    vignetteColor: '#102009',
+    imgPosition: 'center 48%',
+  },
+  {
+    id: 21,
+    brand: 'Wayu Chocolates',
+    name: 'Grageas con Pasas',
+    subtitle: '60% Cacao · Fruta deshidratada',
+    price: 'S/. 16.50',
+    origin: 'Tingo María · Perú',
+    description: 'Pasas seleccionadas cubiertas con chocolate artesanal al 60%. Un clásico intenso y equilibrado.',
+    tags: ['60% Cacao', 'Pasas', 'Clásico'],
+    image: imgGrageasPasas,
+    cardBg: 'linear-gradient(135deg, #21160e 0%, #3d2a1d 100%)',
+    spotColor: 'rgba(225,205,170,0.16)',
+    accentColor: '#ddc7a4',
+    vignetteColor: '#21160e',
+    imgPosition: 'center 44%',
+  },
+  {
+    id: 23,
+    brand: 'Choco Mikhuna',
+    name: 'Cascarilla de Cacao',
+    subtitle: '100% Cacao · 250 gr',
+    price: 'S/. 14.00',
+    origin: 'Tingo María · Perú',
+    description: 'Cascarilla de cacao de aroma profundo, ideal para preparar una infusión cálida y naturalmente reconfortante.',
+    tags: ['100% Cacao', 'Infusión', '250 gr'],
+    image: imgCascarillaMikhuna,
+    cardBg: 'linear-gradient(135deg, #101b08 0%, #233713 100%)',
+    spotColor: 'rgba(95,175,65,0.18)',
+    accentColor: '#91c66d',
+    vignetteColor: '#101b08',
+    imgPosition: 'center 48%',
+  },
+  {
+    id: 24,
+    brand: 'Wayu Chocolates',
+    name: 'Cacao en Polvo',
+    subtitle: 'Cacao puro · Presentación artesanal',
+    price: 'S/. 25.00',
+    origin: 'Tingo María · Perú',
+    description: 'Cacao en polvo de aroma intenso, ideal para bebidas, postres y preparaciones de repostería.',
+    tags: ['Cacao en Polvo', 'Natural', 'Repostería'],
+    image: imgCacaoPolvo,
+    cardBg: 'linear-gradient(135deg, #21140a 0%, #4a2e16 100%)',
+    spotColor: 'rgba(210,160,75,0.18)',
+    accentColor: '#d8ad66',
+    vignetteColor: '#21140a',
+    imgPosition: 'center 48%',
+  },
+]
+
+type Filter = 'Todos' | 'Wayu Chocolates' | 'Choco Mikhuna'
+
+const WHATSAPP_NUMBER = '51923400158'
+const WHATSAPP_CONTACT_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  'Hola, quisiera recibir información sobre sus chocolates artesanales.',
+)}`
+
+const heroSlides: HeroSlide[] = [
+  {
+    image: imgColeccionGrageas,
+    alt: 'Colección de grageas artesanales Wayu',
+    brand: 'Wayu Chocolates',
+    title: 'Seis sabores tropicales',
+    position: 'center',
+  },
+  {
+    image: imgChocoMikhunaBars,
+    alt: 'Colección de chocolates blancos artesanales Wayu',
+    brand: 'Wayu Chocolates',
+    title: 'Chocolate blanco en nueve sabores',
+    position: 'center',
+  },
+  {
+    image: imgMikhunaCremaManiVenado,
+    alt: 'Chocolate Choco Mikhuna con crema de maní',
+    brand: 'Choco Mikhuna',
+    title: 'Cacao y crema de maní',
+    position: 'center',
+  },
+  {
+    image: imgMikhunaColeccion60,
+    alt: 'Colección de chocolates con leche Choco Mikhuna al 60% cacao',
+    brand: 'Choco Mikhuna',
+    title: 'Siente la magia del 60% cacao',
+    position: 'center top',
+    contact: '923 400 158',
+  },
+  {
+    image: imgMikhunaCafeLeche60,
+    alt: 'Chocolates con leche Choco Mikhuna de café y cacao al 60%',
+    brand: 'Choco Mikhuna',
+    title: 'Café y chocolate con leche al 60%',
+    position: 'center top',
+  },
+  {
+    image: imgMikhunaBitterAguaymanto,
+    alt: 'Chocolate bitter Choco Mikhuna con aguaymanto',
+    brand: 'Choco Mikhuna',
+    title: 'Bitter 75% con aguaymanto',
+    position: 'center',
+  },
+  {
+    image: imgCacaoPolvo,
+    alt: 'Cacao en polvo artesanal Wayu',
+    brand: 'Wayu Chocolates',
+    title: 'Cacao puro de aroma intenso',
+    position: 'center 48%',
+  },
+  {
+    image: imgMikhunaMono,
+    alt: 'Chocolate con leche Choco Mikhuna con ilustración de mono ardilla',
+    brand: 'Choco Mikhuna',
+    title: 'Chocolate con leche 50% cacao',
+    position: 'center',
+  },
+]
+
+function parsePrice(price: string) {
+  const amount = price.match(/\d+(?:[.,]\d+)?/)?.[0]
+  return amount ? Number(amount.replace(',', '.')) : 0
+}
+
+function getProductWeight(product: Product) {
+  return [...product.tags, product.subtitle]
+    .map(value => value.match(/\b\d+\s*(?:gr|g)\b/i)?.[0])
+    .find(Boolean)
+}
+
+function productCategoryOrder(product: Product) {
+  if (product.name.startsWith('Grageas')) return 1
+  if (product.name === 'Cacao en Polvo' || product.name === 'Cascarilla de Cacao') return 2
+  return 0
+}
+
+export default function App() {
+  const [hovered, setHovered] = useState<number | null>(null)
+  const [cart, setCart] = useState<Record<number, number>>({})
+  const [cartOpen, setCartOpen] = useState(false)
+  const [filter, setFilter] = useState<Filter>('Todos')
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [heroSlide, setHeroSlide] = useState(0)
+  const [heroPaused, setHeroPaused] = useState(false)
+  const [cartFloating, setCartFloating] = useState(false)
+  const heroTouchStart = useRef<{ x: number; y: number } | null>(null)
+
+  useEffect(() => {
+    if (!selectedProduct && !cartOpen) return
+
+    const previousOverflow = document.body.style.overflow
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      if (selectedProduct) setSelectedProduct(null)
+      else setCartOpen(false)
+    }
+
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', closeOnEscape)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [selectedProduct, cartOpen])
+
+  useEffect(() => {
+    if (heroPaused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const interval = window.setInterval(() => {
+      setHeroSlide(current => (current + 1) % heroSlides.length)
+    }, 4300)
+
+    return () => window.clearInterval(interval)
+  }, [heroPaused])
+
+  useEffect(() => {
+    const updateCartPosition = () => {
+      const scrollTop = Math.max(
+        window.scrollY,
+        document.documentElement.scrollTop,
+        document.body.scrollTop,
+      )
+      setCartFloating(scrollTop > 120)
+    }
+
+    updateCartPosition()
+    window.addEventListener('scroll', updateCartPosition, { passive: true, capture: true })
+    document.addEventListener('scroll', updateCartPosition, { passive: true, capture: true })
+
+    return () => {
+      window.removeEventListener('scroll', updateCartPosition, true)
+      document.removeEventListener('scroll', updateCartPosition, true)
+    }
+  }, [])
+
+  function addToCart(id: number) {
+    setCart(previous => ({ ...previous, [id]: (previous[id] ?? 0) + 1 }))
+  }
+
+  function changeHeroSlide(direction: -1 | 1) {
+    setHeroSlide(current => (current + direction + heroSlides.length) % heroSlides.length)
+  }
+
+  function handleHeroTouchStart(event: TouchEvent<HTMLDivElement>) {
+    const touch = event.touches[0]
+    heroTouchStart.current = { x: touch.clientX, y: touch.clientY }
+    setHeroPaused(true)
+  }
+
+  function handleHeroTouchEnd(event: TouchEvent<HTMLDivElement>) {
+    const start = heroTouchStart.current
+    const touch = event.changedTouches[0]
+    heroTouchStart.current = null
+    setHeroPaused(false)
+
+    if (!start || !touch) return
+
+    const distanceX = touch.clientX - start.x
+    const distanceY = touch.clientY - start.y
+
+    if (Math.abs(distanceX) < 45 || Math.abs(distanceX) <= Math.abs(distanceY)) return
+    changeHeroSlide(distanceX < 0 ? 1 : -1)
+  }
+
+  function updateQuantity(id: number, change: number) {
+    setCart(previous => {
+      const nextQuantity = (previous[id] ?? 0) + change
+      const nextCart = { ...previous }
+
+      if (nextQuantity <= 0) delete nextCart[id]
+      else nextCart[id] = nextQuantity
+
+      return nextCart
+    })
+  }
+
+  function sendWhatsAppOrder() {
+    if (cartItems.length === 0) return
+
+    const productLines = cartItems.map(({ product, quantity }) => {
+      const subtotal = parsePrice(product.price) * quantity
+      return `- ${quantity} x ${product.name} (${product.subtitle}) — S/. ${subtotal.toFixed(2)}`
+    })
+    const message = [
+      'Hola, quisiera realizar el siguiente pedido:',
+      '',
+      ...productLines,
+      '',
+      `Total: S/. ${cartTotal.toFixed(2)}`,
+      '',
+      '¿Podrían confirmarme la disponibilidad, por favor?',
+    ].join('\n')
+
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
+  }
+
+  const filtered = (filter === 'Todos' ? [...products] : products.filter(p => p.brand === filter))
+    .sort((a, b) => productCategoryOrder(a) - productCategoryOrder(b))
+  const cartItems = products
+    .filter(product => cart[product.id])
+    .map(product => ({ product, quantity: cart[product.id] }))
+  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0)
+  const cartTotal = cartItems.reduce((total, { product, quantity }) => {
+    return total + parsePrice(product.price) * quantity
+  }, 0)
+
+  function showCollection(nextFilter: Filter = 'Todos') {
+    setFilter(nextFilter)
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.setTimeout(() => document.querySelector('#catalogo')?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' }), 0)
+  }
+
+  return (
+    <div className="app-shell" style={{ minHeight: '100vh', backgroundColor: '#0a0602', fontFamily: "'DM Sans', sans-serif" }}>
+
+      {/* Nav */}
+      <nav className="site-nav" style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '1.25rem 2.5rem',
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        position: 'sticky', top: 0, zIndex: 50,
+        backgroundColor: 'rgba(10,6,2,0.94)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+      }}>
+        <div className="site-brand">
+          <div className="site-brand-title" style={{ fontFamily: "'Fraunces', serif", fontSize: '1.4rem', fontWeight: 400, color: '#d4956a', letterSpacing: '0.02em' }}>
+            Wayu & Mikhuna
+          </div>
+          <div className="site-brand-subtitle" style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.2em', textTransform: 'uppercase', marginTop: '1px' }}>
+            Chocolates Artesanales · Perú
+          </div>
+        </div>
+        <div className="site-nav-actions">
+          <div className="site-nav-links" style={{ display: 'flex', gap: '2rem', fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
+            {(['Colección', 'Nosotros', 'Contacto'] as const).map(item => (
+              <a key={item} href="#" style={{ textDecoration: 'none', color: 'inherit', transition: 'color 0.2s' }}
+                 onMouseEnter={e => (e.currentTarget.style.color = '#d4956a')}
+                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
+                {item}
+              </a>
+            ))}
+          </div>
+          <button
+            type="button"
+            className={`cart-summary cart-summary-nav${cartFloating ? ' is-hidden' : ''}`}
+            onClick={() => setCartOpen(true)}
+            aria-label={`Abrir carrito con ${cartCount} productos`}
+            aria-hidden={cartFloating}
+            tabIndex={cartFloating ? -1 : undefined}
+          >
+            <span>Carrito</span>
+            <span className="cart-count" aria-live="polite">{cartCount}</span>
+          </button>
+        </div>
+      </nav>
+
+      {cartFloating && (
+        <button
+          type="button"
+          className="cart-summary is-floating"
+          onClick={() => setCartOpen(true)}
+          aria-label={`Abrir carrito con ${cartCount} productos`}
+        >
+          <span>Carrito</span>
+          <span className="cart-count" aria-live="polite">{cartCount}</span>
+        </button>
+      )}
+
+      <a
+        className="whatsapp-float"
+        href={WHATSAPP_CONTACT_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Comunicarse directamente con el vendedor por WhatsApp"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12.04 2a9.84 9.84 0 0 0-8.42 14.93L2.2 22l5.19-1.36A9.98 9.98 0 1 0 12.04 2Zm0 17.96a8.1 8.1 0 0 1-4.13-1.13l-.3-.18-3.08.81.82-3-.2-.31a8.13 8.13 0 1 1 6.89 3.81Zm4.45-6.08c-.24-.12-1.44-.71-1.66-.79-.23-.08-.39-.12-.56.12-.16.25-.63.79-.77.95-.14.17-.29.19-.53.07-.24-.12-1.03-.38-1.96-1.21a7.37 7.37 0 0 1-1.35-1.68c-.14-.24-.01-.37.11-.49.11-.11.24-.29.36-.43.12-.14.16-.24.24-.41.08-.16.04-.3-.02-.43-.06-.12-.55-1.34-.76-1.83-.2-.48-.41-.41-.56-.42h-.47a.9.9 0 0 0-.65.3c-.22.24-.85.83-.85 2.03 0 1.19.88 2.35 1 2.51.12.16 1.72 2.63 4.17 3.69.58.25 1.04.4 1.39.51.59.18 1.12.16 1.54.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.47-.28Z" />
+        </svg>
+        <span className="whatsapp-tooltip" role="tooltip">
+          Comunícate directamente con el vendedor
+        </span>
+      </a>
+
+      {/* Hero */}
+      <section className="hero-layout">
+        <div className="hero-copy">
+          <p style={{ fontSize: '0.65rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#d4956a', marginBottom: '1.5rem' }}>
+            Cacao Fino de Aroma · Tingo María, Perú
+          </p>
+          <h1 className="hero-title" style={{
+            fontFamily: "'Fraunces', serif",
+            fontSize: 'clamp(2.5rem, 7vw, 5rem)',
+            fontWeight: 300, lineHeight: 1.06,
+            color: '#f5ede0', marginBottom: '1.5rem', letterSpacing: '-0.02em',
+          }}>
+            El sabor que nace<br />
+            <em style={{ fontStyle: 'italic', color: '#d4956a' }}>de la selva</em>
+          </h1>
+          <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.4)', maxWidth: '460px', lineHeight: 1.75, marginBottom: '2rem' }}>
+            Chocolates artesanales elaborados del grano a la barra con cacao fino de aroma
+            de Tingo María. Naturaleza convertida en placer.
+          </p>
+          <button className="hero-button" onClick={() => showCollection()}>
+            Explorar la colección
+          </button>
+        </div>
+        <div
+          className={`hero-image${heroSlides[heroSlide].contact ? ' has-contact' : ''}`}
+          role="region"
+          aria-roledescription="carrusel"
+          aria-label="Productos destacados"
+          onMouseEnter={() => setHeroPaused(true)}
+          onMouseLeave={() => setHeroPaused(false)}
+          onTouchStart={handleHeroTouchStart}
+          onTouchEnd={handleHeroTouchEnd}
+          onTouchCancel={() => {
+            heroTouchStart.current = null
+            setHeroPaused(false)
+          }}
+          onFocusCapture={() => setHeroPaused(true)}
+          onBlurCapture={event => {
+            if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setHeroPaused(false)
+          }}
+        >
+          {heroSlides.map((slide, index) => (
+            <img
+              className={`hero-slide${slide.contact ? ' hero-slide-contact' : ''}${index === heroSlide ? ' is-active' : ''}`}
+              key={slide.title}
+              src={slide.image}
+              alt={index === heroSlide ? slide.alt : ''}
+              draggable={false}
+              style={{ objectPosition: slide.position }}
+            />
+          ))}
+          <div className="hero-vignette" />
+          {heroSlides[heroSlide].contact && (
+            <div className="hero-contact">
+              <span>Pedidos directos</span>
+              <strong>{heroSlides[heroSlide].contact}</strong>
+            </div>
+          )}
+          <div className="hero-caption">
+            <span>{heroSlides[heroSlide].brand}</span>
+            <strong>{heroSlides[heroSlide].title}</strong>
+          </div>
+          <button
+            className="hero-arrow hero-arrow-previous"
+            type="button"
+            onClick={() => changeHeroSlide(-1)}
+            aria-label="Ver imagen anterior"
+          >
+            ‹
+          </button>
+          <button
+            className="hero-arrow hero-arrow-next"
+            type="button"
+            onClick={() => changeHeroSlide(1)}
+            aria-label="Ver imagen siguiente"
+          >
+            ›
+          </button>
+        </div>
+      </section>
+
+      {/* Featured collections */}
+      <section className="collection-showcase">
+        <div className="section-heading">
+          <p>Descubre por colección</p>
+          <h2>Una expresión distinta del cacao</h2>
+        </div>
+        <div className="collection-grid">
+          {[
+            {
+              title: 'Mini tabletas',
+              eyebrow: 'Wayu · 9 sabores',
+              image: imgMiniTabletasWayu,
+              position: 'center 45%',
+              action: () => showCollection('Wayu Chocolates'),
+            },
+            {
+              title: 'Del cacao a la taza',
+              eyebrow: 'Choco Mikhuna · Cascarilla',
+              image: imgCascarillaMikhuna,
+              position: 'center 48%',
+              action: () => showCollection('Choco Mikhuna'),
+            },
+            {
+              title: 'Cacao en polvo',
+              eyebrow: 'Wayu · Cacao puro',
+              image: imgCacaoPolvo,
+              position: 'center 48%',
+              action: () => showCollection('Wayu Chocolates'),
+            },
+          ].map(collection => (
+            <button key={collection.title} className="collection-card" onClick={collection.action}>
+              <img src={collection.image} alt="" style={{ objectPosition: collection.position }} />
+              <span className="collection-shade" />
+              <span className="collection-text">
+                <small>{collection.eyebrow}</small>
+                <strong>{collection.title}</strong>
+                <span>Ver productos →</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Divider */}
+      <div className="catalog-divider" style={{ margin: '0 2.5rem 0', height: '1px', background: 'linear-gradient(to right, #d4956a40, #d4956a15, transparent)' }} />
+
+      {/* Filter tabs */}
+      <div id="catalogo" className="catalog-filters" style={{ padding: '2rem 2.5rem 0', display: 'flex', gap: '0.5rem', flexWrap: 'wrap', scrollMarginTop: '6rem' }}>
+        {(['Todos', 'Wayu Chocolates', 'Choco Mikhuna'] as Filter[]).map(f => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            style={{
+              padding: '0.5rem 1.4rem',
+              fontSize: '0.7rem',
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              borderRadius: '2px',
+              cursor: 'pointer',
+              transition: 'all 0.25s ease',
+              border: filter === f ? 'none' : '1px solid rgba(255,255,255,0.12)',
+              backgroundColor: filter === f ? '#d4956a' : 'transparent',
+              color: filter === f ? '#0a0602' : 'rgba(255,255,255,0.45)',
+              fontWeight: filter === f ? 600 : 400,
+            }}
+          >
+            {f} {f !== 'Todos' && `(${products.filter(p => p.brand === f).length})`}
+          </button>
+        ))}
+        <span className="product-count" style={{ marginLeft: 'auto', fontSize: '0.7rem', color: 'rgba(255,255,255,0.2)', alignSelf: 'center', letterSpacing: '0.05em' }}>
+          {filtered.length} productos
+        </span>
+      </div>
+
+      {/* Grid */}
+      <section className="catalog-section" style={{ padding: '2.5rem 1.5rem 6rem' }}>
+        <div className="product-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
+          gap: '1.25rem',
+          maxWidth: '1360px',
+          margin: '0 auto',
+        }}>
+          {filtered.map(p => (
+            <article
+              className="product-card"
+              key={p.id}
+              onMouseEnter={() => setHovered(p.id)}
+              onMouseLeave={() => setHovered(null)}
+              style={{
+                borderRadius: '3px',
+                overflow: 'hidden',
+                position: 'relative',
+                cursor: 'pointer',
+                transition: 'transform 0.45s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.45s ease',
+                transform: hovered === p.id ? 'translateY(-8px)' : 'translateY(0)',
+                boxShadow: hovered === p.id
+                  ? `0 24px 60px rgba(0,0,0,0.65), 0 0 0 1px ${p.accentColor}25`
+                  : '0 4px 24px rgba(0,0,0,0.45)',
+              }}
+            >
+              {/* Image panel */}
+              <button
+                className="product-image-panel"
+                type="button"
+                aria-label={`Ampliar foto de ${p.name}`}
+                onClick={() => setSelectedProduct(p)}
+                style={{
+                  position: 'relative', display: 'block', width: '100%', height: '360px',
+                  padding: 0, border: 0, background: p.cardBg, overflow: 'hidden',
+                  cursor: 'zoom-in', textAlign: 'left',
+                }}
+              >
+
+                {/* Spot light (only for vignette products) */}
+                {p.vignetteColor && (
+                  <div style={{
+                    position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
+                    background: `radial-gradient(ellipse at 50% 40%, ${p.spotColor} 0%, transparent 65%)`,
+                  }} />
+                )}
+
+                {/* Product image */}
+                <img
+                  src={p.image}
+                  alt={p.name}
+                  style={{
+                    position: 'absolute', inset: 0,
+                    width: '100%', height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: p.imgPosition,
+                    transform: hovered === p.id ? 'scale(1.06)' : 'scale(1)',
+                    transition: 'transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94)',
+                    zIndex: 2,
+                  }}
+                />
+
+                {/* Vignette for ugly-background images */}
+                {p.vignetteColor && (
+                  <div style={{
+                    position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none',
+                    background: `radial-gradient(ellipse 78% 72% at 50% 52%, transparent 38%, ${p.vignetteColor} 100%)`,
+                  }} />
+                )}
+
+                {/* Hover description overlay */}
+                <div style={{
+                  position: 'absolute', inset: 0, zIndex: 8,
+                  display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+                  padding: '1.5rem',
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, transparent 52%)',
+                  opacity: hovered === p.id ? 1 : 0,
+                  transition: 'opacity 0.35s ease',
+                }}>
+                  <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.9)', lineHeight: 1.65 }}>
+                    {p.description}
+                  </p>
+                </div>
+
+                {/* Brand badge */}
+                <div style={{
+                  position: 'absolute', top: '1rem', left: '1rem', zIndex: 10,
+                  padding: '0.28rem 0.7rem',
+                  backgroundColor: 'rgba(0,0,0,0.5)',
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: '2px',
+                  fontSize: '0.58rem',
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: p.accentColor,
+                }}>
+                  {p.brand}
+                </div>
+
+                {getProductWeight(p) && (
+                  <div
+                    className="product-weight"
+                    style={{
+                      borderColor: `${p.accentColor}70`,
+                      color: p.accentColor,
+                    }}
+                  >
+                    {getProductWeight(p)}
+                  </div>
+                )}
+              </button>
+
+              {/* Info panel */}
+              <div className="product-info" style={{
+                padding: '1.25rem 1.4rem 1.5rem',
+                backgroundColor: '#120c06',
+                borderTop: `1px solid ${p.accentColor}18`,
+              }}>
+                {/* Tags */}
+                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.9rem' }}>
+                  {p.tags.map(tag => (
+                    <span key={tag} style={{
+                      fontSize: '0.58rem', letterSpacing: '0.1em', textTransform: 'uppercase',
+                      padding: '0.22rem 0.55rem',
+                      border: `1px solid ${p.accentColor}35`,
+                      color: p.accentColor,
+                      borderRadius: '1px',
+                    }}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="product-title-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.3rem' }}>
+                  <h2 style={{
+                    fontFamily: "'Fraunces', serif",
+                    fontSize: '1.15rem', fontWeight: 400,
+                    color: '#f5ede0', lineHeight: 1.25, flex: 1,
+                  }}>
+                    {p.name}
+                  </h2>
+                  <span style={{
+                    fontFamily: "'Fraunces', serif",
+                    fontSize: '1.1rem', fontWeight: 300,
+                    color: p.accentColor,
+                    whiteSpace: 'nowrap', marginLeft: '1rem', marginTop: '2px',
+                  }}>
+                    {p.price}
+                  </span>
+                </div>
+
+                <p style={{ fontSize: '0.73rem', color: 'rgba(255,255,255,0.28)', marginBottom: '1.1rem', letterSpacing: '0.04em', lineHeight: 1.5 }}>
+                  {p.subtitle} · {p.origin}
+                </p>
+
+                <button
+                  onClick={() => addToCart(p.id)}
+                  style={{
+                    width: '100%', padding: '0.7rem',
+                    fontSize: '0.68rem', letterSpacing: '0.18em', textTransform: 'uppercase',
+                    cursor: 'pointer', transition: 'all 0.3s ease', borderRadius: '2px',
+                    border: cart[p.id] ? 'none' : `1px solid ${p.accentColor}40`,
+                    backgroundColor: cart[p.id] ? p.accentColor : 'transparent',
+                    color: cart[p.id] ? '#0a0602' : p.accentColor,
+                    fontWeight: cart[p.id] ? 600 : 400,
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                >
+                  {cart[p.id] ? `Agregar otro · ${cart[p.id]} en carrito` : 'Agregar al carrito'}
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Origin strip */}
+      <section className="origin-strip" style={{
+        padding: '3.5rem 2.5rem',
+        borderTop: '1px solid rgba(255,255,255,0.05)',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+        gap: '2rem',
+        maxWidth: '1100px', margin: '0 auto',
+      }}>
+        {[
+          { label: 'Origen', value: 'Tingo María, Perú' },
+          { label: 'Proceso', value: 'Del grano a la barra' },
+          { label: 'Cacao', value: 'Fino de Aroma' },
+          { label: 'Productos', value: `${products.length} variedades` },
+        ].map(item => (
+          <div key={item.label}>
+            <p style={{ fontSize: '0.58rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: '#d4956a', marginBottom: '0.5rem' }}>
+              {item.label}
+            </p>
+            <p style={{ fontFamily: "'Fraunces', serif", fontSize: '1.05rem', fontWeight: 300, color: '#f5ede0' }}>
+              {item.value}
+            </p>
+          </div>
+        ))}
+      </section>
+
+      {/* Footer */}
+      <footer className="site-footer" style={{
+        borderTop: '1px solid rgba(255,255,255,0.05)',
+        padding: '2rem 2.5rem',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem',
+      }}>
+        <span style={{ fontFamily: "'Fraunces', serif", fontSize: '0.9rem', fontWeight: 300, color: 'rgba(255,255,255,0.2)' }}>
+          Wayu Chocolates & Choco Mikhuna © 2026
+        </span>
+        <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.15)', letterSpacing: '0.1em' }}>
+          Un Placer Natural · Tingo María · Huánuco · Perú
+        </p>
+      </footer>
+
+      {selectedProduct && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Foto ampliada de ${selectedProduct.name}`}
+          onClick={() => setSelectedProduct(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 100,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 'clamp(1rem, 4vw, 3rem)',
+            backgroundColor: 'rgba(5,3,1,0.92)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            cursor: 'zoom-out',
+          }}
+        >
+          <div
+            onClick={event => event.stopPropagation()}
+            style={{
+              position: 'relative',
+              display: 'flex', flexDirection: 'column',
+              maxWidth: 'min(92vw, 1100px)', maxHeight: '92vh',
+              cursor: 'default',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setSelectedProduct(null)}
+              aria-label="Cerrar imagen ampliada"
+              style={{
+                alignSelf: 'flex-end', marginBottom: '0.75rem',
+                padding: '0.55rem 0.9rem',
+                border: '1px solid rgba(255,255,255,0.22)',
+                borderRadius: '2px',
+                background: 'rgba(10,6,2,0.7)',
+                color: '#f5ede0',
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '0.65rem', letterSpacing: '0.16em', textTransform: 'uppercase',
+                cursor: 'pointer',
+              }}
+            >
+              Cerrar
+            </button>
+            <img
+              src={selectedProduct.image}
+              alt={selectedProduct.name}
+              style={{
+                display: 'block',
+                maxWidth: '100%', maxHeight: 'calc(92vh - 5rem)',
+                objectFit: 'contain',
+                borderRadius: '3px',
+                boxShadow: '0 30px 90px rgba(0,0,0,0.7)',
+              }}
+            />
+            <p style={{
+              marginTop: '0.8rem',
+              color: 'rgba(255,255,255,0.75)',
+              fontFamily: "'Fraunces', serif",
+              fontSize: '1rem', fontWeight: 300, textAlign: 'center',
+            }}>
+              {selectedProduct.name}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {cartOpen && (
+        <div
+          className="cart-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Carrito de compras"
+          onClick={() => setCartOpen(false)}
+        >
+          <aside className="cart-panel" onClick={event => event.stopPropagation()}>
+            <div className="cart-header">
+              <div>
+                <p>Tu pedido</p>
+                <h2>Carrito</h2>
+              </div>
+              <button type="button" onClick={() => setCartOpen(false)} aria-label="Cerrar carrito">
+                Cerrar
+              </button>
+            </div>
+
+            <div className="cart-items">
+              {cartItems.length === 0 ? (
+                <div className="cart-empty">
+                  <p>Tu carrito está vacío.</p>
+                  <button type="button" onClick={() => setCartOpen(false)}>
+                    Ver productos
+                  </button>
+                </div>
+              ) : (
+                cartItems.map(({ product, quantity }) => (
+                  <article className="cart-item" key={product.id}>
+                    <img src={product.image} alt="" />
+                    <div className="cart-item-info">
+                      <h3>{product.name}</h3>
+                      <p>{product.subtitle}</p>
+                      <strong>{product.price}</strong>
+                      <div className="quantity-controls" aria-label={`Cantidad de ${product.name}`}>
+                        <button type="button" onClick={() => updateQuantity(product.id, -1)} aria-label={`Restar una unidad de ${product.name}`}>
+                          −
+                        </button>
+                        <span aria-live="polite">{quantity}</span>
+                        <button type="button" onClick={() => updateQuantity(product.id, 1)} aria-label={`Agregar una unidad de ${product.name}`}>
+                          +
+                        </button>
+                        <button className="remove-item" type="button" onClick={() => updateQuantity(product.id, -quantity)}>
+                          Quitar
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                ))
+              )}
+            </div>
+
+            {cartItems.length > 0 && (
+              <div className="cart-footer">
+                <div>
+                  <span>Total estimado</span>
+                  <strong>S/. {cartTotal.toFixed(2)}</strong>
+                </div>
+                <button type="button" onClick={sendWhatsAppOrder}>
+                  Pedir por WhatsApp
+                </button>
+                <small>Se abrirá WhatsApp con el detalle y las cantidades de tu pedido.</small>
+              </div>
+            )}
+          </aside>
+        </div>
+      )}
+    </div>
+  )
+}
+
+
+==== src\index.css ====
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Fraunces', serif;
+  --font-body: 'DM Sans', sans-serif;
+
+  --color-cream: #f5f0e8;
+  --color-stone: #e8e0d4;
+  --color-warm-dark: #1a1410;
+  --color-muted-text: #8a7d6e;
+  --color-accent: #c9a96e;
+  --color-accent-light: #e8d5b0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-cream);
+  color: var(--color-warm-dark);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.app-shell {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+@supports (min-height: 100dvh) {
+  .app-shell {
+    min-height: 100dvh !important;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  opacity: 0;
+}
+
+::-webkit-scrollbar:hover {
+  width: 4px;
+  opacity: 1;
+}
+
+.hero-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(28rem, 1.1fr);
+  gap: 3rem;
+  align-items: center;
+  padding: 4.5rem 2.5rem 3.5rem;
+  max-width: 1360px;
+  margin: 0 auto;
+}
+
+.hero-copy {
+  max-width: 42rem;
+}
+
+.hero-button {
+  border: 1px solid rgba(212, 149, 106, 0.5);
+  border-radius: 2px;
+  background: transparent;
+  color: #d4956a;
+  padding: 0.85rem 1.35rem;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 220ms ease, color 220ms ease;
+}
+
+.hero-button:hover {
+  background: #d4956a;
+  color: #0a0602;
+}
+
+.hero-image {
+  position: relative;
+  min-height: 29rem;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #211108;
+  touch-action: pan-y;
+}
+
+.hero-image > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.hero-slide {
+  opacity: 0;
+  transform: scale(1.018);
+  will-change: opacity, transform;
+  transition:
+    opacity 1100ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 4.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-slide.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hero-slide.hero-slide-contact {
+  object-fit: contain;
+  object-position: center;
+  background: #102315;
+  transform: scale(1.018);
+}
+
+.hero-slide.hero-slide-contact.is-active {
+  transform: scale(1);
+}
+
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(10, 6, 2, 0.78), transparent 48%),
+    radial-gradient(ellipse 82% 78% at 52% 46%, transparent 42%, rgba(10, 6, 2, 0.78) 100%);
+  pointer-events: none;
+}
+
+.hero-contact {
+  position: absolute;
+  z-index: 3;
+  bottom: 0.75rem;
+  left: max(1rem, calc(50% - 13.5rem));
+  display: flex;
+  min-width: 10.5rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 3px;
+  background: rgba(10, 6, 2, 0.72);
+  color: #f5ede0;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.hero-image.has-contact .hero-caption {
+  right: 1.4rem;
+  left: auto;
+  justify-content: flex-end;
+}
+
+.hero-image.has-contact .hero-caption span {
+  display: none;
+}
+
+.hero-contact span {
+  color: #d4956a;
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero-contact strong {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.hero-caption {
+  position: absolute;
+  z-index: 2;
+  inset: auto 1.75rem 1.65rem;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #f5ede0;
+}
+
+.hero-caption span {
+  color: #d4956a;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.hero-caption strong {
+  max-width: 13rem;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 300;
+  text-align: right;
+}
+
+.hero-arrow {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  background: rgba(10, 6, 2, 0.64);
+  color: #f5ede0;
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transform: translateY(-50%);
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease;
+}
+
+.hero-arrow-previous {
+  left: 1rem;
+}
+
+.hero-arrow-next {
+  right: 1rem;
+}
+
+.hero-arrow:hover {
+  border-color: rgba(212, 149, 106, 0.68);
+  background: rgba(10, 6, 2, 0.86);
+  color: #d4956a;
+}
+
+.hero-arrow:active {
+  background: #d4956a;
+  color: #120c06;
+}
+
+.collection-showcase {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 2rem 2.5rem 4.5rem;
+}
+
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-heading p {
+  color: #d4956a;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.section-heading h2 {
+  color: #f5ede0;
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, 3vw, 2.4rem);
+  font-weight: 300;
+}
+
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.collection-card {
+  position: relative;
+  min-height: 19rem;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  background: #1a0e07;
+  color: #f5ede0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.collection-card > img,
+.collection-shade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.collection-card > img {
+  object-fit: cover;
+  transition: transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.collection-card:hover > img {
+  transform: scale(1.045);
+}
+
+.collection-shade {
+  background:
+    linear-gradient(to top, rgba(10, 6, 2, 0.94), rgba(10, 6, 2, 0.05) 70%),
+    radial-gradient(ellipse 88% 76% at 50% 42%, transparent 44%, rgba(10, 6, 2, 0.54));
+}
+
+.collection-text {
+  position: absolute;
+  inset: auto 1.35rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.collection-text small {
+  margin-bottom: 0.35rem;
+  color: #d4956a;
+  font-size: 0.56rem;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+
+.collection-text strong {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 300;
+}
+
+.collection-text > span {
+  margin-top: 0.75rem;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.product-weight {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  padding: 0.42rem 0.7rem;
+  border: 1px solid;
+  border-radius: 2px;
+  background: rgba(10, 6, 2, 0.76);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.site-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.cart-summary {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.65rem 0.75rem 0.65rem 1.1rem;
+  border: 1px solid #e8d5b0;
+  border-radius: 999px;
+  background: #e8d5b0;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  color: #24160d;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  transition: border-color 180ms ease, transform 180ms ease, background 180ms ease;
+}
+
+.cart-summary:hover {
+  border-color: #f5ede0;
+  background: #f5ede0;
+  transform: translateY(-2px);
+}
+
+.cart-summary-nav.is-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.cart-summary.is-floating {
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1.5rem, env(safe-area-inset-right));
+  z-index: 90;
+  animation: cart-float-in 220ms ease-out;
+}
+
+@keyframes cart-float-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.6rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cart-count {
+  display: grid;
+  min-width: 1.8rem;
+  height: 1.8rem;
+  padding: 0 0.35rem;
+  place-items: center;
+  border-radius: 999px;
+  background: #24160d;
+  color: #f5ede0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.whatsapp-float {
+  position: fixed;
+  right: max(1.5rem, env(safe-area-inset-right));
+  bottom: max(1.5rem, env(safe-area-inset-bottom));
+  z-index: 80;
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  background: #5fa96d;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.48);
+  color: #08140b;
+  transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.whatsapp-float:hover,
+.whatsapp-float:focus-visible {
+  background: #76c484;
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.56);
+  transform: translateY(-2px);
+}
+
+.whatsapp-float svg {
+  width: 1.55rem;
+  height: 1.55rem;
+  fill: currentColor;
+}
+
+.whatsapp-tooltip {
+  position: absolute;
+  right: calc(100% + 0.75rem);
+  width: max-content;
+  max-width: 15rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid rgba(212, 149, 106, 0.3);
+  border-radius: 3px;
+  background: #120c06;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.42);
+  color: #f5ede0;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(0.35rem);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.whatsapp-float:hover .whatsapp-tooltip,
+.whatsapp-float:focus-visible .whatsapp-tooltip {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.cart-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(5, 3, 1, 0.76);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.cart-panel {
+  display: flex;
+  width: min(100%, 30rem);
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border-left: 1px solid rgba(212, 149, 106, 0.2);
+  background: #120c06;
+  box-shadow: -24px 0 80px rgba(0, 0, 0, 0.55);
+}
+
+.cart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cart-header p {
+  margin-bottom: 0.25rem;
+  color: #d4956a;
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.cart-header h2 {
+  color: #f5ede0;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 300;
+}
+
+.cart-header button,
+.cart-empty button {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 2px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.68);
+  padding: 0.55rem 0.8rem;
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cart-items {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.4rem 1.5rem;
+}
+
+.cart-empty {
+  display: grid;
+  min-height: 15rem;
+  place-items: center;
+  align-content: center;
+  gap: 1.25rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 1rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.cart-item > img {
+  width: 5.5rem;
+  height: 6.8rem;
+  border-radius: 2px;
+  object-fit: cover;
+}
+
+.cart-item-info {
+  min-width: 0;
+}
+
+.cart-item-info h3 {
+  color: #f5ede0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.cart-item-info > p {
+  margin: 0.3rem 0 0.5rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.66rem;
+  line-height: 1.4;
+}
+
+.cart-item-info > strong {
+  color: #d4956a;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.8rem;
+}
+
+.quantity-controls button {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid rgba(212, 149, 106, 0.28);
+  border-radius: 2px;
+  background: transparent;
+  color: #d4956a;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.quantity-controls > span {
+  min-width: 1.8rem;
+  color: #f5ede0;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.quantity-controls .remove-item {
+  width: auto;
+  margin-left: auto;
+  padding: 0 0.3rem;
+  border-color: transparent;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cart-footer {
+  flex-shrink: 0;
+  padding: 1.25rem 1.5rem calc(1.25rem + env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0d0804;
+}
+
+.cart-footer > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cart-footer span {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cart-footer strong {
+  color: #f5ede0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.cart-footer > button {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: 1px solid #5fa96d;
+  border-radius: 2px;
+  background: #5fa96d;
+  color: #08140b;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cart-footer small {
+  display: block;
+  margin-top: 0.65rem;
+  color: rgba(255, 255, 255, 0.28);
+  font-size: 0.58rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .site-nav {
+    gap: 1.5rem;
+  }
+
+  .site-nav-links {
+    gap: 1.1rem !important;
+  }
+
+  .hero-layout {
+    grid-template-columns: 1fr;
+    padding-top: 3.5rem;
+  }
+
+  .hero-image {
+    min-height: 24rem;
+  }
+
+  .collection-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .collection-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .origin-strip {
+    padding-right: 2rem !important;
+    padding-left: 2rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .site-nav {
+    gap: 0.75rem;
+    padding: 0.9rem max(1rem, env(safe-area-inset-right)) 0.9rem max(1rem, env(safe-area-inset-left)) !important;
+  }
+
+  .site-brand {
+    min-width: 0;
+  }
+
+  .site-brand-title {
+    font-size: 1.08rem !important;
+    white-space: nowrap;
+  }
+
+  .site-brand-subtitle {
+    max-width: 12rem;
+    overflow: hidden;
+    font-size: 0.5rem !important;
+    letter-spacing: 0.12em !important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .site-nav-links {
+    display: none !important;
+  }
+
+  .cart-summary {
+    flex: 0 0 auto;
+    padding: 0.55rem 0.6rem 0.55rem 0.9rem !important;
+    font-size: 0.66rem !important;
+  }
+
+  .cart-summary.is-floating {
+    right: max(1rem, env(safe-area-inset-right));
+  }
+
+  .whatsapp-float {
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .hero-layout,
+  .collection-showcase {
+    padding-left: max(1.25rem, env(safe-area-inset-left));
+    padding-right: max(1.25rem, env(safe-area-inset-right));
+  }
+
+  .hero-layout {
+    gap: 2rem;
+    padding-top: 2.75rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .hero-title {
+    font-size: clamp(2.1rem, 12vw, 3rem) !important;
+  }
+
+  .hero-image {
+    min-height: 20rem;
+  }
+
+  .hero-caption {
+    inset: auto 1.1rem 1.1rem;
+  }
+
+  .section-heading {
+    display: block;
+  }
+
+  .section-heading p {
+    margin-bottom: 0.65rem;
+  }
+
+  .collection-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .collection-card:last-child {
+    grid-column: auto;
+  }
+
+  .collection-card {
+    min-height: 17rem;
+  }
+
+  .catalog-divider {
+    margin-right: 1.25rem !important;
+    margin-left: 1.25rem !important;
+  }
+
+  .catalog-filters {
+    gap: 0.45rem !important;
+    padding: 1.5rem max(1.25rem, env(safe-area-inset-right)) 0 max(1.25rem, env(safe-area-inset-left)) !important;
+  }
+
+  .catalog-filters > button {
+    flex: 1 1 auto;
+    padding-right: 0.8rem !important;
+    padding-left: 0.8rem !important;
+  }
+
+  .product-count {
+    flex-basis: 100%;
+    margin-top: 0.4rem;
+    margin-left: 0 !important;
+  }
+
+  .catalog-section {
+    padding: 1.75rem max(1rem, env(safe-area-inset-right)) 4rem max(1rem, env(safe-area-inset-left)) !important;
+  }
+
+  .product-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .product-image-panel {
+    height: clamp(17.5rem, 100vw, 22rem) !important;
+  }
+
+  .product-info {
+    padding: 1.1rem 1.15rem 1.25rem !important;
+  }
+
+  .origin-strip {
+    gap: 1.5rem !important;
+    padding: 2.75rem max(1.25rem, env(safe-area-inset-right)) 2.75rem max(1.25rem, env(safe-area-inset-left)) !important;
+  }
+
+  .site-footer {
+    align-items: flex-start !important;
+    padding: 1.75rem max(1.25rem, env(safe-area-inset-right)) calc(1.75rem + env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left)) !important;
+  }
+
+  .cart-panel {
+    width: 100%;
+    border-left: 0;
+  }
+
+  .cart-header,
+  .cart-items,
+  .cart-footer {
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+}
+
+@media (max-width: 360px) {
+  .site-brand-subtitle {
+    max-width: 9rem;
+  }
+
+  .cart-summary {
+    padding-right: 0.55rem !important;
+    padding-left: 0.55rem !important;
+    letter-spacing: 0.06em !important;
+  }
+
+  .hero-layout,
+  .collection-showcase {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .hero-title {
+    font-size: 2rem !important;
+  }
+
+  .product-title-row {
+    display: block !important;
+  }
+
+  .product-title-row > span {
+    display: block;
+    margin-top: 0.35rem !important;
+    margin-left: 0 !important;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .product-image-panel {
+    height: 16rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-button,
+  .hero-slide,
+  .collection-card > img,
+  .product-card,
+  .product-image-panel > img {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+==== src\main.tsx ====
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+
+==== src\vite-env.d.ts ====
+/// <reference types="vite/client" />
+

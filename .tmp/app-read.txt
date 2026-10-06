@@ -1,0 +1,770 @@
+[/workspaces/default/code/src/App.tsx#d7cb]
+1:import { useState } from 'react'
+2:
+3:// Existing images
+4:import imgWayuLeche40Box from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.47.jpeg'
+5:import imgChocoMikhunaBars from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.46__1_.jpeg'
+6:import imgChocoMikhunaPeq from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.46.jpeg'
+7:import imgWayuLeche40Hand from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.43__3_.jpeg'
+8:import imgWayuBitter75 from '@/imports/WhatsApp_Image_2026-09-20_at_22.46.18.jpeg'
+9:
+10:// New images
+11:import imgMikhunaCremaManiVenado from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.43.jpeg'
+12:import imgMikhunaBitterAguaymanto from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.42__1_.jpeg'
+13:import imgMikhunaCafe from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.42.jpeg'
+14:import imgMikhunaBitterAguaymantoFabric from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.41__2_.jpeg'
+15:import imgMikhunasManiSplash from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.41__1_.jpeg'
+16:import imgMikhunaMono from '@/imports/WhatsApp_Image_2026-09-20_at_22.20.41.jpeg'
+17:import imgMikhunaCremaManíSand from '@/imports/WhatsApp_Image_2026-09-20_at_22.45.02.jpeg'
+18:import imgGrageasAguaymanto from '@/imports/WhatsApp_Image_2026-09-26_at_15.17.08.jpeg'
+19:import imgGrageasArandanoNueva from '@/imports/WhatsApp_Image_2026-09-26_at_15.16.42.jpeg'
+20:import imgGrageasFresa from '@/imports/WhatsApp_Image_2026-09-26_at_15.16.11.jpeg'
+21:import imgGrageasMango from '@/imports/WhatsApp_Image_2026-09-26_at_15.15.31.jpeg'
+22:import imgGrageasPina from '@/imports/WhatsApp_Image_2026-09-26_at_15.15.00.jpeg'
+23:import imgGrageasPasas from '@/imports/WhatsApp_Image_2026-09-26_at_15.14.33.jpeg'
+24:import imgMiniTabletasWayu from '@/imports/WhatsApp_Image_2026-09-26_at_15.13.22.jpeg'
+25:import imgMikhunaManiNueva from '@/imports/WhatsApp_Image_2026-09-26_at_15.11.21.jpeg'
+26:import imgColeccionGrageas from '@/imports/WhatsApp_Image_2026-09-26_at_15.07.54__2_.jpeg'
+27:import imgCascarillaMikhuna from '@/imports/WhatsApp_Image_2026-09-26_at_15.07.54__1_.jpeg'
+28:
+29:type Product = {
+30:  id: number
+31:  brand: 'Wayu Chocolates' | 'Choco Mikhuna'
+32:  name: string
+33:  subtitle: string
+34:  price: string
+35:  origin: string
+36:  description: string
+37:  tags: string[]
+38:  image: string
+39:  cardBg: string
+40:  spotColor: string
+41:  accentColor: string
+42:  vignetteColor: string | null   // null = image already has nice bg, no vignette
+43:  imgPosition: string
+44:}
+45:
+46:const products: Product[] = [
+47:  // ── WAYU ──────────────────────────────────────────────────────
+48:  {
+49:    id: 2,
+50:    brand: 'Wayu Chocolates',
+51:    name: 'Grageas con Arándano',
+52:    subtitle: '60% Cacao · Tingo María',
+53:    price: 'Consultar',
+54:    origin: 'Tingo María · Perú',
+55:    description: 'Arándanos frescos cubiertos en chocolate 60% cacao fino de aroma. Explosión de sabor agridulce.',
+56:    tags: ['60% Cacao', 'Arándano', 'Antioxidante'],
+57:    image: imgGrageasArandanoNueva,
+58:    cardBg: 'linear-gradient(135deg, #0c0a1f 0%, #1a1540 100%)',
+59:    spotColor: 'rgba(100,100,255,0.25)',
+60:    accentColor: '#9fa8da',
+61:    vignetteColor: '#0c0a1f',
+62:    imgPosition: 'center 50%',
+63:  },
+64:  {
+65:    id: 3,
+66:    brand: 'Wayu Chocolates',
+67:    name: 'Chocolate con Leche',
+68:    subtitle: '40% Cacao · Caja 80 gr',
+69:    price: 'Consultar',
+70:    origin: 'Tingo María · Perú',
+71:    description: 'Chocolate con leche 40% cacao fino de aroma. Artesanal bean to bar. Notas dulces y equilibradas.',
+72:    tags: ['40% Cacao', '80 gr', 'Bean to Bar'],
+73:    image: imgWayuLeche40Box,
+74:    cardBg: 'linear-gradient(135deg, #1a0a10 0%, #2d1020 100%)',
+75:    spotColor: 'rgba(255,100,160,0.18)',
+76:    accentColor: '#f48fb1',
+77:    vignetteColor: '#1a0a10',
+78:    imgPosition: 'center center',
+79:  },
+80:  {
+81:    id: 4,
+82:    brand: 'Wayu Chocolates',
+83:    name: 'Chocolate con Leche',
+84:    subtitle: '40% Cacao · Caja 30 gr',
+85:    price: 'Consultar',
+86:    origin: 'Tingo María · Perú',
+87:    description: 'Presentación mini en caja ilustrada. Ideal como degustación o regalo. Cacao fino de Tingo María.',
+88:    tags: ['40% Cacao', '30 gr', 'Regalo'],
+89:    image: imgWayuLeche40Hand,
+90:    cardBg: 'linear-gradient(135deg, #060e1a 0%, #0d1f38 100%)',
+91:    spotColor: 'rgba(60,140,255,0.15)',
+92:    accentColor: '#64b5f6',
+93:    vignetteColor: '#060e1a',
+94:    imgPosition: 'center 25%',
+95:  },
+96:  {
+97:    id: 5,
+98:    brand: 'Wayu Chocolates',
+99:    name: 'Chocolate Bitter Cítrico',
+100:    subtitle: '75% Cacao · Arándano · 80 gr',
+101:    price: 'Consultar',
+102:    origin: 'Tingo María · Perú',
+103:    description: 'Intenso chocolate oscuro 75% cacao con notas cítricas y arándano. Para los amantes del chocolate puro.',
+104:    tags: ['75% Cacao', 'Arándano', 'Bitter'],
+105:    image: imgWayuBitter75,
+106:    cardBg: 'linear-gradient(135deg, #0d0a1a 0%, #1a1438 100%)',
+107:    spotColor: 'rgba(140,100,255,0.18)',
+108:    accentColor: '#b39ddb',
+109:    vignetteColor: '#0d0a1a',
+110:    imgPosition: 'center 30%',
+111:  },
+112:  {
+113:    id: 6,
+114:    brand: 'Wayu Chocolates',
+115:    name: 'Colección Grageas & Tabletas',
+116:    subtitle: 'Variedad completa',
+117:    price: 'Consultar',
+118:    origin: 'Tingo María · Perú',
+119:    description: 'La colección completa Wayu: grageas de nibs, grageas de arándano y tabletas de chocolate con leche en sus distintos formatos.',
+120:    tags: ['Colección', 'Variedad', 'Gift Set'],
+121:    image: imgColeccionGrageas,
+122:    cardBg: 'linear-gradient(135deg, #3b1f0a 0%, #5c2e12 100%)',
+123:    spotColor: 'rgba(200,140,60,0.2)',
+124:    accentColor: '#d4956a',
+125:    vignetteColor: '#3b1f0a',
+126:    imgPosition: 'center center',
+127:  },
+128:
+129:  // ── CHOCO MIKHUNA ─────────────────────────────────────────────
+130:  {
+131:    id: 7,
+132:    brand: 'Choco Mikhuna',
+133:    name: 'Chocolate con Leche · Maní',
+134:    subtitle: '60% Cacao · Gallito de las Rocas · 80 gr',
+135:    price: 'Consultar',
+136:    origin: 'Tingo María · Perú',
+137:    description: 'Chocolate con leche 60% con trozos de maní. El Gallito de las Rocas, ave nacional del Perú, protagoniza este empaque selva adentro.',
+138:    tags: ['60% Cacao', 'Maní', '80 gr'],
+139:    image: imgMikhunaManiNueva,
+140:    cardBg: 'linear-gradient(135deg, #0a1a08 0%, #0f2e10 100%)',
+141:    spotColor: 'rgba(80,180,60,0.15)',
+142:    accentColor: '#a5d6a7',
+143:    vignetteColor: null,
+144:    imgPosition: 'center center',
+145:  },
+146:  {
+147:    id: 8,
+148:    brand: 'Choco Mikhuna',
+149:    name: 'Chocolate con Leche · Crema de Maní',
+150:    subtitle: '60% Cacao · Venado Rojo · 80 gr',
+151:    price: 'Consultar',
+152:    origin: 'Tingo María · Perú',
+153:    description: 'La combinación perfecta de chocolate con leche 60% y crema de maní. Ilustrado con el Venado Rojo entre flores silvestres.',
+154:    tags: ['60% Cacao', 'Crema Maní', '80 gr'],
+155:    image: imgMikhunaCremaManiVenado,
+156:    cardBg: 'linear-gradient(135deg, #1a1205 0%, #2e2010 100%)',
+157:    spotColor: 'rgba(220,180,80,0.15)',
+158:    accentColor: '#ffe082',
+159:    vignetteColor: null,
+160:    imgPosition: 'center center',
+161:  },
+162:  {
+163:    id: 9,
+164:    brand: 'Choco Mikhuna',
+165:    name: 'Chocolate Bitter · Aguaymanto',
+166:    subtitle: '75% Cacao · 80 gr',
+167:    price: 'Consultar',
+168:    origin: 'Tingo María · Perú',
+169:    description: 'Cacao intenso al 75% con el toque exótico del aguaymanto. Un placer único que mezcla lo amargo con lo tropical.',
+170:    tags: ['75% Cacao', 'Aguaymanto', 'Bitter'],
+171:    image: imgMikhunaBitterAguaymanto,
+172:    cardBg: 'linear-gradient(135deg, #1f0d00 0%, #3d1e00 100%)',
+173:    spotColor: 'rgba(255,160,20,0.2)',
+174:    accentColor: '#ffb74d',
+175:    vignetteColor: null,
+176:    imgPosition: 'center center',
+177:  },
+178:  {
+179:    id: 10,
+180:    brand: 'Choco Mikhuna',
+181:    name: 'Chocolate con Leche · Café',
+182:    subtitle: '60% Cacao · Perezoso · 80 gr',
+183:    price: 'Consultar',
+184:    origin: 'Tingo María · Perú',
+185:    description: 'Chocolate con leche 60% con granos de café de la selva. El simpático Perezoso de Tres Dedos da la bienvenida en cada caja.',
+186:    tags: ['60% Cacao', 'Café', '80 gr'],
+187:    image: imgMikhunaCafe,
+188:    cardBg: 'linear-gradient(135deg, #150a00 0%, #2e1800 100%)',
+189:    spotColor: 'rgba(180,120,40,0.2)',
+190:    accentColor: '#d4a24a',
+191:    vignetteColor: null,
+192:    imgPosition: 'center center',
+193:  },
+194:  {
+195:    id: 11,
+196:    brand: 'Choco Mikhuna',
+197:    name: 'Chocolate Bitter · Aguaymanto',
+198:    subtitle: '75% Cacao · Edición Dorada · 80 gr',
+199:    price: 'Consultar',
+200:    origin: 'Tingo María · Perú',
+201:    description: '"Cacao intenso al 75% con el toque exótico del aguaymanto. Un placer único." Presentación especial edición dorada.',
+202:    tags: ['75% Cacao', 'Aguaymanto', 'Edición Especial'],
+203:    image: imgMikhunaBitterAguaymantoFabric,
+204:    cardBg: 'linear-gradient(135deg, #1f1200 0%, #3d2600 100%)',
+205:    spotColor: 'rgba(220,170,30,0.2)',
+206:    accentColor: '#ffd54f',
+207:    vignetteColor: null,
+208:    imgPosition: 'center center',
+209:  },
+210:  {
+211:    id: 12,
+212:    brand: 'Choco Mikhuna',
+213:    name: 'Chocolate con Leche · Maní',
+214:    subtitle: '60% Cacao · Edición Splash · 80 gr',
+215:    price: 'Consultar',
+216:    origin: 'Tingo María · Perú',
+217:    description: '¡El placer del chocolate se une a la delicia del maní! Presentación con splash de chocolate. Gallito de las Rocas.',
+218:    tags: ['60% Cacao', 'Maní', 'Edición Especial'],
+219:    image: imgMikhunasManiSplash,
+220:    cardBg: 'linear-gradient(135deg, #1a0800 0%, #3a1500 100%)',
+221:    spotColor: 'rgba(200,100,30,0.2)',
+222:    accentColor: '#ff8a65',
+223:    vignetteColor: null,
+224:    imgPosition: 'center center',
+225:  },
+226:  {
+227:    id: 13,
+228:    brand: 'Choco Mikhuna',
+229:    name: 'Chocolate con Leche · 50% Cacao',
+230:    subtitle: 'Mono Ardilla · 80 gr',
+231:    price: 'Consultar',
+232:    origin: 'Tingo María · Perú',
+233:    description: 'Chocolate con leche 50% cacao fino de aroma. El adorable Mono Ardilla de la Amazonía peruana es el protagonista de este sabor.',
+234:    tags: ['50% Cacao', 'Leche', '80 gr'],
+235:    image: imgMikhunaMono,
+236:    cardBg: 'linear-gradient(135deg, #061525 0%, #0a2540 100%)',
+237:    spotColor: 'rgba(60,160,220,0.2)',
+238:    accentColor: '#80deea',
+239:    vignetteColor: null,
+240:    imgPosition: 'center center',
+241:  },
+242:  {
+243:    id: 14,
+244:    brand: 'Choco Mikhuna',
+245:    name: 'Chocolate con Leche · Crema de Maní',
+246:    subtitle: '60% Cacao · Venado · Edición Arena · 80 gr',
+247:    price: 'Consultar',
+248:    origin: 'Tingo María · Perú',
+249:    description: 'La textura suave de la crema de maní en chocolate con leche 60%. Presentación editorial sobre tierra amazónica.',
+250:    tags: ['60% Cacao', 'Crema Maní', 'Artesanal'],
+251:    image: imgMikhunaCremaManíSand,
+252:    cardBg: 'linear-gradient(135deg, #1a1000 0%, #332200 100%)',
+253:    spotColor: 'rgba(200,160,60,0.2)',
+254:    accentColor: '#d4a84a',
+255:    vignetteColor: null,
+256:    imgPosition: 'center center',
+257:  },
+258:  {
+259:    id: 15,
+260:    brand: 'Choco Mikhuna',
+261:    name: 'Chocolate Blanco · 9 Sabores',
+262:    subtitle: 'S/. 6.50 · Bean to Bar',
+263:    price: 'S/. 6.50',
+264:    origin: 'Bean to Bar · Artesanal',
+265:    description: 'Chocolate blanco artesanal en 9 sabores: café, nibs, maní, ajonjolí, piña, aguaymanto, arándano, limón y fresa.',
+266:    tags: ['9 Sabores', 'Blanco', 'Artesanal'],
+267:    image: imgChocoMikhunaBars,
+268:    cardBg: 'linear-gradient(135deg, #1c1508 0%, #2e2210 100%)',
+269:    spotColor: 'rgba(220,180,80,0.15)',
+270:    accentColor: '#e6c84a',
+271:    vignetteColor: '#1c1508',
+272:    imgPosition: 'center 20%',
+273:  },
+274:  {
+275:    id: 16,
+276:    brand: 'Choco Mikhuna',
+277:    name: 'Choco Arcah · Bombón',
+278:    subtitle: '50% Cacao · S/. 2.00',
+279:    price: 'S/. 2.00',
+280:    origin: 'Selva Peruana',
+281:    description: 'Bombones de chocolate con leche 50% cacao y crema de maní. La merienda perfecta de la selva. ¡Delicia Natural!',
+282:    tags: ['50% Cacao', 'Bombón', 'S/. 2.00'],
+283:    image: imgChocoMikhunaPeq,
+284:    cardBg: 'linear-gradient(135deg, #071a08 0%, #0f2e10 100%)',
+285:    spotColor: 'rgba(100,200,80,0.12)',
+286:    accentColor: '#81c784',
+287:    vignetteColor: '#071a08',
+288:    imgPosition: 'center 40%',
+289:  },
+290:  {
+291:    id: 17,
+292:    brand: 'Wayu Chocolates',
+293:    name: 'Grageas con Aguaymanto',
+294:    subtitle: '60% Cacao · Fruta tropical',
+295:    price: 'Consultar',
+296:    origin: 'Tingo María · Perú',
+297:    description: 'Aguaymanto cubierto con chocolate 60% cacao. Una combinación vibrante, frutal y ligeramente ácida.',
+298:    tags: ['60% Cacao', 'Aguaymanto', 'Natural'],
+299:    image: imgGrageasAguaymanto,
+300:    cardBg: 'linear-gradient(135deg, #291306 0%, #542408 100%)',
+301:    spotColor: 'rgba(255,170,45,0.24)',
+302:    accentColor: '#f1a24c',
+303:    vignetteColor: '#291306',
+304:    imgPosition: 'center 48%',
+305:  },
+306:  {
+307:    id: 18,
+308:    brand: 'Wayu Chocolates',
+309:    name: 'Grageas con Fresa',
+310:    subtitle: '60% Cacao · Fruta deshidratada',
+311:    price: 'Consultar',
+312:    origin: 'Tingo María · Perú',
+313:    description: 'Fresa frutal cubierta con chocolate artesanal al 60%. Dulce, fresca y perfecta para compartir.',
+314:    tags: ['60% Cacao', 'Fresa', 'Artesanal'],
+315:    image: imgGrageasFresa,
+316:    cardBg: 'linear-gradient(135deg, #280809 0%, #521416 100%)',
+317:    spotColor: 'rgba(240,100,105,0.22)',
+318:    accentColor: '#ef8b86',
+319:    vignetteColor: '#280809',
+320:    imgPosition: 'center 45%',
+321:  },
+322:  {
+323:    id: 19,
+324:    brand: 'Wayu Chocolates',
+325:    name: 'Grageas con Mango',
+326:    subtitle: '60% Cacao · Fruta tropical',
+327:    price: 'Consultar',
+328:    origin: 'Tingo María · Perú',
+329:    description: 'Mango tropical cubierto con chocolate 60% cacao fino de aroma. Suave, jugoso y naturalmente peruano.',
+330:    tags: ['60% Cacao', 'Mango', 'Tropical'],
+331:    image: imgGrageasMango,
+332:    cardBg: 'linear-gradient(135deg, #241403 0%, #493006 100%)',
+333:    spotColor: 'rgba(245,187,55,0.22)',
+334:    accentColor: '#e9b94e',
+335:    vignetteColor: '#241403',
+336:    imgPosition: 'center 46%',
+337:  },
+338:  {
+339:    id: 20,
+340:    brand: 'Wayu Chocolates',
+341:    name: 'Grageas con Piña',
+342:    subtitle: '60% Cacao · Fruta tropical',
+343:    price: 'Consultar',
+344:    origin: 'Tingo María · Perú',
+345:    description: 'Piña tropical bañada en chocolate 60% cacao. Un contraste luminoso entre dulzor, acidez y cacao.',
+346:    tags: ['60% Cacao', 'Piña', 'Tropical'],
+347:    image: imgGrageasPina,
+348:    cardBg: 'linear-gradient(135deg, #102009 0%, #203c0e 100%)',
+349:    spotColor: 'rgba(135,205,70,0.2)',
+350:    accentColor: '#a8cf6a',
+351:    vignetteColor: '#102009',
+352:    imgPosition: 'center 48%',
+353:  },
+354:  {
+355:    id: 21,
+356:    brand: 'Wayu Chocolates',
+357:    name: 'Grageas con Pasas',
+358:    subtitle: '60% Cacao · Fruta deshidratada',
+359:    price: 'Consultar',
+360:    origin: 'Tingo María · Perú',
+361:    description: 'Pasas seleccionadas cubiertas con chocolate artesanal al 60%. Un clásico intenso y equilibrado.',
+362:    tags: ['60% Cacao', 'Pasas', 'Clásico'],
+363:    image: imgGrageasPasas,
+364:    cardBg: 'linear-gradient(135deg, #21160e 0%, #3d2a1d 100%)',
+365:    spotColor: 'rgba(225,205,170,0.16)',
+366:    accentColor: '#ddc7a4',
+367:    vignetteColor: '#21160e',
+368:    imgPosition: 'center 44%',
+369:  },
+370:  {
+371:    id: 22,
+372:    brand: 'Wayu Chocolates',
+373:    name: 'Mini Tabletas · 8 Sabores',
+374:    subtitle: '40% Cacao · Chocolate blanco con leche',
+375:    price: 'Consultar',
+376:    origin: 'Tingo María · Perú',
+377:    description: 'Colección de mini tabletas en ocho sabores: fresa, camu camu, piña, maracuyá, nibs, arándano, maní y limón.',
+378:    tags: ['8 Sabores', '40% Cacao', 'Colección'],
+379:    image: imgMiniTabletasWayu,
+380:    cardBg: 'linear-gradient(135deg, #170d08 0%, #352016 100%)',
+381:    spotColor: 'rgba(220,160,100,0.18)',
+382:    accentColor: '#d9a06e',
+383:    vignetteColor: '#170d08',
+384:    imgPosition: 'center center',
+385:  },
+386:  {
+387:    id: 23,
+388:    brand: 'Choco Mikhuna',
+389:    name: 'Cascarilla de Cacao',
+390:    subtitle: '100% Cacao · 250 gr',
+391:    price: 'Consultar',
+392:    origin: 'Tingo María · Perú',
+393:    description: 'Cascarilla de cacao de aroma profundo, ideal para preparar una infusión cálida y naturalmente reconfortante.',
+394:    tags: ['100% Cacao', 'Infusión', '250 gr'],
+395:    image: imgCascarillaMikhuna,
+396:    cardBg: 'linear-gradient(135deg, #101b08 0%, #233713 100%)',
+397:    spotColor: 'rgba(95,175,65,0.18)',
+398:    accentColor: '#91c66d',
+399:    vignetteColor: '#101b08',
+400:    imgPosition: 'center 48%',
+401:  },
+402:]
+403:
+404:type Filter = 'Todos' | 'Wayu Chocolates' | 'Choco Mikhuna'
+405:
+406:export default function App() {
+407:  const [hovered, setHovered] = useState<number | null>(null)
+408:  const [cart, setCart] = useState<number[]>([])
+409:  const [filter, setFilter] = useState<Filter>('Todos')
+410:
+411:  function addToCart(id: number) {
+412:    setCart(prev => [...prev, id])
+413:    setTimeout(() => setCart(prev => prev.filter(x => x !== id)), 1800)
+414:  }
+415:
+416:  const filtered = filter === 'Todos' ? products : products.filter(p => p.brand === filter)
+417:  const cartCount = cart.length
+418:
+419:  function showCollection(nextFilter: Filter = 'Todos') {
+420:    setFilter(nextFilter)
+421:    window.setTimeout(() => document.querySelector('#catalogo')?.scrollIntoView({ behavior: 'smooth' }), 0)
+422:  }
+423:
+424:  return (
+425:    <div style={{ minHeight: '100vh', backgroundColor: '#0a0602', fontFamily: "'DM Sans', sans-serif" }}>
+426:
+427:      {/* Nav */}
+428:      <nav style={{
+429:        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+430:        padding: '1.25rem 2.5rem',
+431:        borderBottom: '1px solid rgba(255,255,255,0.07)',
+432:        position: 'sticky', top: 0, zIndex: 50,
+433:        backgroundColor: 'rgba(10,6,2,0.94)',
+434:        backdropFilter: 'blur(14px)',
+435:      }}>
+436:        <div>
+437:          <div style={{ fontFamily: "'Fraunces', serif", fontSize: '1.4rem', fontWeight: 400, color: '#d4956a', letterSpacing: '0.02em' }}>
+438:            Wayu & Mikhuna
+439:          </div>
+440:          <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.2em', textTransform: 'uppercase', marginTop: '1px' }}>
+441:            Chocolates Artesanales · Perú
+442:          </div>
+443:        </div>
+444:        <div style={{ display: 'flex', gap: '2rem', fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
+445:          {(['Colección', 'Nosotros', 'Contacto'] as const).map(item => (
+446:            <a key={item} href="#" style={{ textDecoration: 'none', color: 'inherit', transition: 'color 0.2s' }}
+447:               onMouseEnter={e => (e.currentTarget.style.color = '#d4956a')}
+448:               onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
+449:              {item}
+450:            </a>
+451:          ))}
+452:        </div>
+453:        <div style={{
+454:          fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase',
+455:          padding: '0.5rem 1.2rem',
+456:          border: '1px solid rgba(212,149,106,0.4)',
+457:          color: '#d4956a',
+458:          borderRadius: '2px',
+459:          cursor: 'pointer',
+460:        }}>
+461:          Carrito {cartCount > 0 && `(${cartCount})`}
+462:        </div>
+463:      </nav>
+464:
+465:      {/* Hero */}
+466:      <section className="hero-layout">
+467:        <div className="hero-copy">
+468:          <p style={{ fontSize: '0.65rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#d4956a', marginBottom: '1.5rem' }}>
+469:            Cacao Fino de Aroma · Tingo María, Perú
+470:          </p>
+471:          <h1 style={{
+472:            fontFamily: "'Fraunces', serif",
+473:            fontSize: 'clamp(2.5rem, 7vw, 5rem)',
+474:            fontWeight: 300, lineHeight: 1.06,
+475:            color: '#f5ede0', marginBottom: '1.5rem', letterSpacing: '-0.02em',
+476:          }}>
+477:            El sabor que nace<br />
+478:            <em style={{ fontStyle: 'italic', color: '#d4956a' }}>de la selva</em>
+479:          </h1>
+480:          <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.4)', maxWidth: '460px', lineHeight: 1.75, marginBottom: '2rem' }}>
+481:            Chocolates artesanales bean to bar elaborados con cacao fino de aroma
+482:            de Tingo María. Naturaleza convertida en placer.
+483:          </p>
+484:          <button className="hero-button" onClick={() => showCollection()}>
+485:            Explorar la colección
+486:          </button>
+487:        </div>
+488:        <div className="hero-image">
+489:          <img src={imgColeccionGrageas} alt="Colección de grageas artesanales Wayu" />
+490:          <div className="hero-vignette" />
+491:          <div className="hero-caption">
+492:            <span>Wayu Chocolates</span>
+493:            <strong>Seis sabores tropicales</strong>
+494:          </div>
+495:        </div>
+496:      </section>
+497:
+498:      {/* Featured collections */}
+499:      <section className="collection-showcase">
+500:        <div className="section-heading">
+501:          <p>Descubre por colección</p>
+502:          <h2>Una expresión distinta del cacao</h2>
+503:        </div>
+504:        <div className="collection-grid">
+505:          {[
+506:            {
+507:              title: 'Grageas tropicales',
+508:              eyebrow: 'Wayu · 7 sabores',
+509:              image: imgColeccionGrageas,
+510:              position: 'center center',
+511:              action: () => showCollection('Wayu Chocolates'),
+512:            },
+513:            {
+514:              title: 'Mini tabletas',
+515:              eyebrow: 'Wayu · 8 sabores',
+516:              image: imgMiniTabletasWayu,
+517:              position: 'center 45%',
+518:              action: () => showCollection('Wayu Chocolates'),
+519:            },
+520:            {
+521:              title: 'Del cacao a la taza',
+522:              eyebrow: 'Choco Mikhuna · Cascarilla',
+523:              image: imgCascarillaMikhuna,
+524:              position: 'center 48%',
+525:              action: () => showCollection('Choco Mikhuna'),
+526:            },
+527:          ].map(collection => (
+528:            <button key={collection.title} className="collection-card" onClick={collection.action}>
+529:              <img src={collection.image} alt="" style={{ objectPosition: collection.position }} />
+530:              <span className="collection-shade" />
+531:              <span className="collection-text">
+532:                <small>{collection.eyebrow}</small>
+533:                <strong>{collection.title}</strong>
+534:                <span>Ver productos →</span>
+535:              </span>
+536:            </button>
+537:          ))}
+538:        </div>
+539:      </section>
+540:
+541:      {/* Divider */}
+542:      <div style={{ margin: '0 2.5rem 0', height: '1px', background: 'linear-gradient(to right, #d4956a40, #d4956a15, transparent)' }} />
+543:
+544:      {/* Filter tabs */}
+545:      <div id="catalogo" style={{ padding: '2rem 2.5rem 0', display: 'flex', gap: '0.5rem', flexWrap: 'wrap', scrollMarginTop: '6rem' }}>
+546:        {(['Todos', 'Wayu Chocolates', 'Choco Mikhuna'] as Filter[]).map(f => (
+547:          <button
+548:            key={f}
+549:            onClick={() => setFilter(f)}
+550:            style={{
+551:              padding: '0.5rem 1.4rem',
+552:              fontSize: '0.7rem',
+553:              letterSpacing: '0.12em',
+554:              textTransform: 'uppercase',
+555:              borderRadius: '2px',
+556:              cursor: 'pointer',
+557:              transition: 'all 0.25s ease',
+558:              border: filter === f ? 'none' : '1px solid rgba(255,255,255,0.12)',
+559:              backgroundColor: filter === f ? '#d4956a' : 'transparent',
+560:              color: filter === f ? '#0a0602' : 'rgba(255,255,255,0.45)',
+561:              fontWeight: filter === f ? 600 : 400,
+562:            }}
+563:          >
+564:            {f} {f !== 'Todos' && `(${products.filter(p => p.brand === f).length})`}
+565:          </button>
+566:        ))}
+567:        <span style={{ marginLeft: 'auto', fontSize: '0.7rem', color: 'rgba(255,255,255,0.2)', alignSelf: 'center', letterSpacing: '0.05em' }}>
+568:          {filtered.length} productos
+569:        </span>
+570:      </div>
+571:
+572:      {/* Grid */}
+573:      <section style={{ padding: '2.5rem 1.5rem 6rem' }}>
+574:        <div style={{
+575:          display: 'grid',
+576:          gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
+577:          gap: '1.25rem',
+578:          maxWidth: '1360px',
+579:          margin: '0 auto',
+580:        }}>
+581:          {filtered.map(p => (
+582:            <article
+583:              key={p.id}
+584:              onMouseEnter={() => setHovered(p.id)}
+585:              onMouseLeave={() => setHovered(null)}
+586:              style={{
+587:                borderRadius: '3px',
+588:                overflow: 'hidden',
+589:                position: 'relative',
+590:                cursor: 'pointer',
+591:                transition: 'transform 0.45s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.45s ease',
+592:                transform: hovered === p.id ? 'translateY(-8px)' : 'translateY(0)',
+593:                boxShadow: hovered === p.id
+594:                  ? `0 24px 60px rgba(0,0,0,0.65), 0 0 0 1px ${p.accentColor}25`
+595:                  : '0 4px 24px rgba(0,0,0,0.45)',
+596:              }}
+597:            >
+598:              {/* Image panel */}
+599:              <div style={{ position: 'relative', height: '360px', background: p.cardBg, overflow: 'hidden' }}>
+600:
+601:                {/* Spot light (only for vignette products) */}
+602:                {p.vignetteColor && (
+603:                  <div style={{
+604:                    position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
+605:                    background: `radial-gradient(ellipse at 50% 40%, ${p.spotColor} 0%, transparent 65%)`,
+606:                  }} />
+607:                )}
+608:
+609:                {/* Product image */}
+610:                <img
+611:                  src={p.image}
+612:                  alt={p.name}
+613:                  style={{
+614:                    position: 'absolute', inset: 0,
+615:                    width: '100%', height: '100%',
+616:                    objectFit: 'cover',
+617:                    objectPosition: p.imgPosition,
+618:                    transform: hovered === p.id ? 'scale(1.06)' : 'scale(1)',
+619:                    transition: 'transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94)',
+620:                    zIndex: 2,
+621:                  }}
+622:                />
+623:
+624:                {/* Vignette for ugly-background images */}
+625:                {p.vignetteColor && (
+626:                  <div style={{
+627:                    position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none',
+628:                    background: `radial-gradient(ellipse 78% 72% at 50% 52%, transparent 38%, ${p.vignetteColor} 100%)`,
+629:                  }} />
+630:                )}
+631:
+632:                {/* Hover description overlay */}
+633:                <div style={{
+634:                  position: 'absolute', inset: 0, zIndex: 8,
+635:                  display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+636:                  padding: '1.5rem',
+637:                  background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, transparent 52%)',
+638:                  opacity: hovered === p.id ? 1 : 0,
+639:                  transition: 'opacity 0.35s ease',
+640:                }}>
+641:                  <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.9)', lineHeight: 1.65 }}>
+642:                    {p.description}
+643:                  </p>
+644:                </div>
+645:
+646:                {/* Brand badge */}
+647:                <div style={{
+648:                  position: 'absolute', top: '1rem', left: '1rem', zIndex: 10,
+649:                  padding: '0.28rem 0.7rem',
+650:                  backgroundColor: 'rgba(0,0,0,0.5)',
+651:                  backdropFilter: 'blur(10px)',
+652:                  borderRadius: '2px',
+653:                  fontSize: '0.58rem',
+654:                  letterSpacing: '0.18em',
+655:                  textTransform: 'uppercase',
+656:                  color: p.accentColor,
+657:                }}>
+658:                  {p.brand}
+659:                </div>
+660:              </div>
+661:
+662:              {/* Info panel */}
+663:              <div style={{
+664:                padding: '1.25rem 1.4rem 1.5rem',
+665:                backgroundColor: '#120c06',
+666:                borderTop: `1px solid ${p.accentColor}18`,
+667:              }}>
+668:                {/* Tags */}
+669:                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.9rem' }}>
+670:                  {p.tags.map(tag => (
+671:                    <span key={tag} style={{
+672:                      fontSize: '0.58rem', letterSpacing: '0.1em', textTransform: 'uppercase',
+673:                      padding: '0.22rem 0.55rem',
+674:                      border: `1px solid ${p.accentColor}35`,
+675:                      color: p.accentColor,
+676:                      borderRadius: '1px',
+677:                    }}>
+678:                      {tag}
+679:                    </span>
+680:                  ))}
+681:                </div>
+682:
+683:                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.3rem' }}>
+684:                  <h2 style={{
+685:                    fontFamily: "'Fraunces', serif",
+686:                    fontSize: '1.15rem', fontWeight: 400,
+687:                    color: '#f5ede0', lineHeight: 1.25, flex: 1,
+688:                  }}>
+689:                    {p.name}
+690:                  </h2>
+691:                  <span style={{
+692:                    fontFamily: "'Fraunces', serif",
+693:                    fontSize: '1.1rem', fontWeight: 300,
+694:                    color: p.accentColor,
+695:                    whiteSpace: 'nowrap', marginLeft: '1rem', marginTop: '2px',
+696:                  }}>
+697:                    {p.price}
+698:                  </span>
+699:                </div>
+700:
+701:                <p style={{ fontSize: '0.73rem', color: 'rgba(255,255,255,0.28)', marginBottom: '1.1rem', letterSpacing: '0.04em', lineHeight: 1.5 }}>
+702:                  {p.subtitle} · {p.origin}
+703:                </p>
+704:
+705:                <button
+706:                  onClick={() => addToCart(p.id)}
+707:                  style={{
+708:                    width: '100%', padding: '0.7rem',
+709:                    fontSize: '0.68rem', letterSpacing: '0.18em', textTransform: 'uppercase',
+710:                    cursor: 'pointer', transition: 'all 0.3s ease', borderRadius: '2px',
+711:                    border: cart.includes(p.id) ? 'none' : `1px solid ${p.accentColor}40`,
+712:                    backgroundColor: cart.includes(p.id) ? p.accentColor : 'transparent',
+713:                    color: cart.includes(p.id) ? '#0a0602' : p.accentColor,
+714:                    fontWeight: cart.includes(p.id) ? 600 : 400,
+715:                    fontFamily: "'DM Sans', sans-serif",
+716:                  }}
+717:                >
+718:                  {cart.includes(p.id) ? '✓ Agregado' : 'Agregar al carrito'}
+719:                </button>
+720:              </div>
+721:            </article>
+722:          ))}
+723:        </div>
+724:      </section>
+725:
+726:      {/* Origin strip */}
+727:      <section style={{
+728:        padding: '3.5rem 2.5rem',
+729:        borderTop: '1px solid rgba(255,255,255,0.05)',
+730:        display: 'grid',
+731:        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+732:        gap: '2rem',
+733:        maxWidth: '1100px', margin: '0 auto',
+734:      }}>
+735:        {[
+736:          { label: 'Origen', value: 'Tingo María, Perú' },
+737:          { label: 'Proceso', value: 'Bean to Bar Artesanal' },
+738:          { label: 'Cacao', value: 'Fino de Aroma' },
+739:          { label: 'Productos', value: `${products.length} variedades` },
+740:        ].map(item => (
+741:          <div key={item.label}>
+742:            <p style={{ fontSize: '0.58rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: '#d4956a', marginBottom: '0.5rem' }}>
+743:              {item.label}
+744:            </p>
+745:            <p style={{ fontFamily: "'Fraunces', serif", fontSize: '1.05rem', fontWeight: 300, color: '#f5ede0' }}>
+746:              {item.value}
+747:            </p>
+748:          </div>
+749:        ))}
+750:      </section>
+751:
+752:      {/* Footer */}
+753:      <footer style={{
+754:        borderTop: '1px solid rgba(255,255,255,0.05)',
+755:        padding: '2rem 2.5rem',
+756:        display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem',
+757:      }}>
+758:        <span style={{ fontFamily: "'Fraunces', serif", fontSize: '0.9rem', fontWeight: 300, color: 'rgba(255,255,255,0.2)' }}>
+759:          Wayu Chocolates & Choco Mikhuna © 2026
+760:        </span>
+761:        <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.15)', letterSpacing: '0.1em' }}>
+762:          Un Placer Natural · Tingo María · Huánuco · Perú
+763:        </p>
+764:      </footer>
+765:    </div>
+766:  )
+767:}
+
+(End of file — 767 lines.)
