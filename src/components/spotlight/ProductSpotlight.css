@@ -1,0 +1,299 @@
+@property --spot-accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #d4a24a;
+}
+
+@property --spot-bg {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #2e1800;
+}
+
+.spotlight {
+  /* Mismas proporciones que los productos del carrusel: el vuelo encaja exacto al aterrizar. */
+  --spot-h: min(58vh, 36rem);
+  --spot-h: min(58svh, 36rem);
+  --spot-w: calc(var(--spot-h) * 0.8);
+  --spot-text: #f5ede0;
+
+  position: relative;
+  display: grid;
+  min-height: 100vh;
+  min-height: 100svh;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  padding: calc(var(--nav-h) + clamp(1rem, 3vh, 2rem)) 2.5rem clamp(2.5rem, 6vh, 4rem);
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 0 0 50% 50% / 0 0 4rem 4rem;
+  background:
+    radial-gradient(ellipse 45% 50% at 50% 42%, color-mix(in srgb, var(--spot-accent) 22%, transparent), transparent 72%),
+    radial-gradient(ellipse 90% 80% at 50% 40%, color-mix(in srgb, var(--spot-bg) 70%, #120a05), #0b0603 82%);
+  color: var(--spot-text);
+  transition: --spot-accent 900ms ease, --spot-bg 900ms ease;
+}
+
+/* Al ver las presentaciones el producto se achica para dejar sitio a las tarjetas. */
+.spotlight.is-open {
+  --spot-h: min(32vh, 20rem);
+  --spot-h: min(32svh, 20rem);
+
+  align-content: start;
+}
+
+.spotlight :focus-visible {
+  outline-color: var(--spot-accent);
+}
+
+/* ===== Escenario: descripción · producto · nombre ===== */
+.spotlight-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(1.5rem, 5vw, 5rem);
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-bottom: 3.5rem;
+}
+
+.spotlight-copy {
+  max-width: 22rem;
+  animation: spotlight-rise 800ms cubic-bezier(0.22, 0.8, 0.2, 1) both;
+}
+
+.spotlight-copy-start {
+  justify-self: end;
+  text-align: right;
+}
+
+.spotlight-copy-end {
+  justify-self: start;
+}
+
+.spotlight-eyebrow {
+  margin-bottom: 1rem;
+  color: var(--spot-accent);
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.spotlight-description {
+  color: rgba(245, 237, 224, 0.86);
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+  font-weight: 300;
+  line-height: 1.55;
+}
+
+.spotlight-name {
+  text-wrap: balance;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.6vw, 3.2rem);
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+
+.spotlight-count {
+  margin-top: 0.9rem;
+  color: rgba(245, 237, 224, 0.55);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+}
+
+/* ===== Producto al centro ===== */
+.spotlight-figure {
+  position: relative;
+  width: var(--spot-w);
+  height: var(--spot-h);
+  transition:
+    width 600ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    height 600ms cubic-bezier(0.22, 0.8, 0.2, 1);
+}
+
+.spotlight-glow {
+  position: absolute;
+  inset: 4% -12% 10%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--spot-accent) 40%, transparent), transparent);
+  filter: blur(22px);
+  pointer-events: none;
+}
+
+.spotlight-image {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 30px 30px rgba(0, 0, 0, 0.55)) drop-shadow(0 8px 10px rgba(0, 0, 0, 0.35));
+}
+
+.spotlight-floor {
+  position: absolute;
+  right: 12%;
+  bottom: -3%;
+  left: 12%;
+  height: 7%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.75), transparent);
+  filter: blur(5px);
+}
+
+/* ===== Esquina: texto "Ver presentaciones" + botón circular "+" ===== */
+.spotlight-toggle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--spot-text);
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.spotlight-toggle-label {
+  position: relative;
+  padding-bottom: 0.3rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* Línea que crece bajo el texto al pasar el mouse. */
+.spotlight-toggle-label::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--spot-accent);
+  content: '';
+  transform: scaleX(0.35);
+  transform-origin: right;
+  transition: transform 300ms ease;
+}
+
+.spotlight-toggle:hover .spotlight-toggle-label::after,
+.spotlight-toggle:focus-visible .spotlight-toggle-label::after {
+  transform: scaleX(1);
+}
+
+.spotlight-toggle-icon {
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--spot-accent);
+  box-shadow: 0 12px 28px -10px var(--spot-accent);
+  color: #1a0f08;
+  transition: transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms ease;
+}
+
+.spotlight-toggle-icon .icon {
+  width: 1.4rem;
+  height: 1.4rem;
+  stroke-width: 2.2;
+  transition: transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.spotlight-toggle:hover .spotlight-toggle-icon {
+  transform: scale(1.08);
+}
+
+.spotlight-toggle:active .spotlight-toggle-icon {
+  transform: scale(0.94);
+}
+
+.spotlight.is-open .spotlight-toggle-icon .icon {
+  transform: rotate(45deg);
+}
+
+/* Invita a pulsarlo con un latido suave mientras está cerrado. */
+.spotlight:not(.is-open) .spotlight-toggle-icon {
+  animation: spotlight-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes spotlight-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}
+
+@keyframes spotlight-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--spot-accent) 55%, transparent); }
+  60% { box-shadow: 0 0 0 9px transparent; }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .spotlight {
+    --spot-h: min(44vh, 26rem, 110vw);
+    --spot-h: min(44svh, 26rem, 110vw);
+
+    padding: calc(var(--nav-h) + 1rem) max(1.25rem, env(safe-area-inset-right)) 2.75rem max(1.25rem, env(safe-area-inset-left));
+    border-radius: 0 0 50% 50% / 0 0 2rem 2rem;
+  }
+
+  .spotlight.is-open {
+    --spot-h: min(26vh, 14rem);
+    --spot-h: min(26svh, 14rem);
+  }
+
+  .spotlight-stage {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 1.5rem;
+    padding-bottom: 0;
+    text-align: center;
+  }
+
+  /* En móvil: nombre arriba, producto, descripción y el botón al final. */
+  .spotlight-copy-end {
+    order: -1;
+    justify-self: center;
+  }
+
+  .spotlight-copy-start {
+    order: 1;
+    justify-self: center;
+    text-align: center;
+  }
+
+  .spotlight-toggle {
+    position: static;
+    order: 2;
+  }
+
+  .spotlight.is-open .spotlight-copy-start {
+    display: none;
+  }
+}
+
+@media (hover: none) {
+  .spotlight-toggle:hover .spotlight-toggle-icon {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spotlight,
+  .spotlight-copy,
+  .spotlight-figure,
+  .spotlight-toggle-icon,
+  .spotlight-toggle-icon .icon {
+    animation: none !important;
+    transition: none !important;
+  }
+}

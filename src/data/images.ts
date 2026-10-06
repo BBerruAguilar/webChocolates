@@ -1,0 +1,25 @@
+// Rutas de las fotos alojadas en Cloudinary. Las URLs finales (formato, calidad y
+// tamaño) se generan con services/cloudinary para poder servir varios anchos.
+export const IMAGES = {
+  wayuLeche40Box: 'v1791150364/WhatsApp_Image_2026-09-26_at_15.29.11.jpg',
+  wayuBlanco9Sabores: 'v1791150365/WhatsApp_Image_2026-09-27_at_15.12.11.jpg',
+  mikhunaMiniTableta: 'v1791150364/WhatsApp_Image_2026-09-27_at_15.46.51.jpg',
+  wayuBitter75: 'v1791155195/WhatsApp_Image_2026-10-04_at_18.02.11.jpg',
+  mikhunaCremaManiVenado: 'v1791150366/WhatsApp_Image_2026-09-20_at_22.20.43.jpg',
+  mikhunaBitterAguaymanto: 'v1791150366/WhatsApp_Image_2026-09-20_at_22.20.41_2.jpg',
+  mikhunaCafe: 'v1791150366/WhatsApp_Image_2026-09-20_at_22.20.42.jpg',
+  mikhunaManiSplash: 'v1791150365/WhatsApp_Image_2026-09-20_at_22.20.43_1.jpg',
+  mikhunaMono: 'v1791150366/WhatsApp_Image_2026-09-20_at_22.20.41.jpg',
+  grageasAguaymanto: 'v1791150364/WhatsApp_Image_2026-09-26_at_15.17.08.jpg',
+  grageasArandano: 'v1791150365/WhatsApp_Image_2026-09-26_at_15.16.42.jpg',
+  grageasFresa: 'v1791150364/WhatsApp_Image_2026-09-26_at_15.16.11.jpg',
+  grageasMango: 'v1791150365/WhatsApp_Image_2026-09-26_at_15.15.31.jpg',
+  grageasPina: 'v1791150365/WhatsApp_Image_2026-09-26_at_15.15.00.jpg',
+  grageasPasas: 'v1791150365/WhatsApp_Image_2026-09-26_at_15.14.33.jpg',
+  coleccionGrageas: 'v1791150365/WhatsApp_Image_2026-09-26_at_15.07.54_2.jpg',
+  cascarillaMikhuna: 'v1791150365/WhatsApp_Image_2026-09-26_at_15.07.54_1.jpg',
+  cacaoPolvo: 'v1791150365/WhatsApp_Image_2026-09-26_at_15.07.54.jpg',
+  mikhunaCaja30: 'v1791156267/WhatsApp_Image_2026-09-29_at_20.29.42.jpg',
+  mikhunaCafeLeche60: 'v1791156267/WhatsApp_Image_2026-09-29_at_20.22.50.jpg',
+  mikhunaColeccion60: 'v1791156267/WhatsApp_Image_2026-09-29_at_12.18.41.jpg',
+} as const

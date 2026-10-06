@@ -1,0 +1,599 @@
+/* ==========================================================================
+   HERO · Anillo 3D de productos sin fondo que gira lentamente
+   Capas (de atrás hacia adelante): fondo desenfocado → brillo → palabra gigante
+   → partículas lejanas → anillo de productos → partículas cercanas → texto.
+   ========================================================================== */
+
+/* Registrar los colores permite que el fondo cambie de tono con transición suave. */
+@property --hero-accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #d4a24a;
+}
+
+@property --hero-bg {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #2e1800;
+}
+
+.hero {
+  /* Tamaño de cada producto y geometría del anillo. Todo escala a partir de --item-h. */
+  --item-h: min(60vh, 40rem, 120vw);
+  --item-h: min(60svh, 40rem, 120vw);
+  --item-w: calc(var(--item-h) * 0.8);
+  --ring-r: calc(var(--item-w) * 1.9);
+  --ring-step: 36deg;
+  --ring-y: 52%;
+  --ring-duration: 1200ms;
+  --ease-ring: cubic-bezier(0.22, 0.8, 0.2, 1);
+  --hero-text: #f5ede0;
+
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  height: 100vh;
+  height: 100svh;
+  min-height: 38rem;
+  overflow: hidden;
+  isolation: isolate;
+  /* El menú es transparente y flota encima: se deja su alto libre arriba. */
+  padding: calc(var(--nav-h) + clamp(0.5rem, 2vh, 1.5rem)) 2.5rem clamp(1.5rem, 4vh, 2.5rem);
+  background: radial-gradient(ellipse 80% 70% at 50% 50%, color-mix(in srgb, var(--hero-bg) 75%, #120a05), #0b0603 78%);
+  color: var(--hero-text);
+  transition: --hero-accent 1200ms ease, --hero-bg 1200ms ease;
+}
+
+.hero :focus-visible {
+  outline-color: var(--hero-accent);
+}
+
+/* ===== Fondo ===== */
+.hero-backdrop {
+  position: absolute;
+  inset: -10%;
+  z-index: -3;
+  pointer-events: none;
+}
+
+.hero-backdrop img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.5;
+  filter: blur(90px) saturate(1.5);
+  transform: scale(1.3);
+}
+
+.hero-backdrop img.is-entering {
+  animation: hero-fade-in 1200ms ease both;
+}
+
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 38% 48% at 50% var(--ring-y), color-mix(in srgb, var(--hero-accent) 30%, transparent), transparent 70%),
+    radial-gradient(ellipse 120% 90% at 50% 50%, transparent 55%, rgba(5, 3, 1, 0.7));
+}
+
+.hero-word {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transform: translate3d(calc(var(--px, 0) * -30px), calc(var(--py, 0) * -18px), 0);
+  transition: transform 900ms var(--ease-ring);
+}
+
+.hero-word span {
+  margin-top: -4vh;
+  color: transparent;
+  font-family: var(--font-display);
+  font-size: clamp(7rem, 21vw, 22rem);
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 0.8;
+  white-space: nowrap;
+  opacity: 0.6;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--hero-accent) 45%, transparent);
+  animation: hero-word-in 1400ms var(--ease-ring) both;
+}
+
+/* ===== Partículas ===== */
+.hero-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero-particle {
+  position: absolute;
+  display: block;
+  color: color-mix(in srgb, var(--hero-accent) 30%, #4a2a17);
+  opacity: 0.6;
+  filter: blur(var(--blur, 0));
+  transform: translate3d(calc(var(--px, 0) * var(--depth) * 36px), calc(var(--py, 0) * var(--depth) * 24px), 0);
+  transition: transform 900ms var(--ease-ring);
+}
+
+.hero-particle-shape {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: rotate(var(--rotate));
+  animation: hero-particle-float 20s ease-in-out infinite alternate;
+}
+
+/* ===== Anillo 3D ===== */
+.hero-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  perspective: 1500px;
+  perspective-origin: 50% var(--ring-y);
+  touch-action: pan-y;
+}
+
+.hero-ring {
+  position: absolute;
+  top: var(--ring-y);
+  left: 50%;
+  transform-style: preserve-3d;
+  /* Inclinación según el puntero: da la sensación de mirar la escena desde otro ángulo. */
+  transform: rotateX(calc(var(--py, 0) * -4deg)) rotateY(calc(var(--px, 0) * 7deg));
+  transition: transform 900ms var(--ease-ring);
+}
+
+.hero-ring-sway {
+  transform-style: preserve-3d;
+  /* Todo el anillo gira despacio alrededor de su propio eje, de lado a lado. */
+  animation: hero-ring-sway 18s ease-in-out infinite alternate;
+}
+
+.hero-item {
+  --theta: calc(var(--offset) * var(--ring-step));
+  --scale: 1;
+
+  position: absolute;
+  top: calc(var(--item-h) / -2);
+  left: calc(var(--item-w) / -2);
+  width: var(--item-w);
+  height: var(--item-h);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  /* Se ubica sobre el borde de un cilindro: el ángulo interpola, así el producto recorre un arco. */
+  transform:
+    translateZ(calc(var(--ring-r) * -1))
+    rotateY(var(--theta))
+    translateZ(var(--ring-r))
+    scale(var(--scale));
+  transition:
+    transform var(--ring-duration) var(--ease-ring),
+    opacity var(--ring-duration) ease,
+    filter var(--ring-duration) ease;
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hero-item.is-wrapping {
+  transition: none;
+}
+
+/* Halo de luz detrás del producto del frente. */
+.hero-item::before {
+  position: absolute;
+  inset: 8% -6% 14%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--hero-accent) 42%, transparent), transparent);
+  content: '';
+  filter: blur(18px);
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+.hero-item[data-depth='0']::before {
+  opacity: 1;
+}
+
+.hero-item[data-depth='1'] {
+  --scale: 0.9;
+  opacity: 0.92;
+  filter: brightness(0.55) saturate(0.85) blur(1.5px);
+}
+
+.hero-item[data-depth='2'] {
+  --scale: 0.8;
+  opacity: 0.55;
+  filter: brightness(0.4) saturate(0.7) blur(4px);
+}
+
+.hero-item[data-depth='3'] {
+  --scale: 0.74;
+  opacity: 0;
+  pointer-events: none;
+  filter: brightness(0.4) blur(5px);
+}
+
+.hero-item[data-depth='1']:hover {
+  filter: brightness(0.8) saturate(0.95) blur(0);
+}
+
+.hero-item-body {
+  position: absolute;
+  inset: 0;
+  display: block;
+  /* Cada producto gira lentamente sobre sí mismo. */
+  animation: hero-item-turn 10s ease-in-out infinite alternate;
+}
+
+.hero-item-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 30px 30px rgba(0, 0, 0, 0.5)) drop-shadow(0 8px 10px rgba(0, 0, 0, 0.35));
+  transform: scale(0.96);
+  transform-origin: center bottom;
+  transition: transform 1200ms var(--ease-ring);
+  user-select: none;
+}
+
+.hero-item[data-depth='0'] .hero-item-image {
+  transform: scale(1.04);
+}
+
+/* Sombra de contacto en el "piso". */
+.hero-item-shadow {
+  position: absolute;
+  right: 12%;
+  bottom: -3%;
+  left: 12%;
+  height: 7%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.7), transparent);
+  filter: blur(5px);
+}
+
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(to top, rgba(8, 5, 2, 0.85) 0%, rgba(8, 5, 2, 0) 34%),
+    linear-gradient(to bottom, rgba(8, 5, 2, 0.6), transparent 28%);
+}
+
+/* ===== Contenido ===== */
+.hero-intro,
+.hero-bottom {
+  position: relative;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.hero-bottom > * {
+  pointer-events: auto;
+}
+
+.hero-intro {
+  max-width: 30rem;
+}
+
+.hero-eyebrow {
+  margin-bottom: 0.9rem;
+  color: color-mix(in srgb, var(--hero-accent) 70%, var(--hero-text));
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.hero-title {
+  color: var(--hero-text);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.2vw, 3.6rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.04;
+}
+
+.hero-title em {
+  display: block;
+  color: var(--hero-accent);
+  font-style: italic;
+}
+
+.hero-bottom {
+  grid-row: 3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.hero-product {
+  max-width: 26rem;
+}
+
+.hero-product-content {
+  animation: hero-rise 800ms var(--ease-ring) both;
+}
+
+.hero-product-name {
+  text-wrap: balance;
+  margin-bottom: 0.6rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.8vw, 2.5rem);
+  font-weight: 300;
+  line-height: 1.08;
+}
+
+.hero-product-description {
+  color: rgba(245, 237, 224, 0.72);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.hero-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+  /* Deja libre la esquina del botón flotante de WhatsApp. */
+  margin-right: 3.5rem;
+}
+
+.hero-counter {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: rgba(245, 237, 224, 0.6);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+}
+
+.hero-counter strong {
+  color: var(--hero-text);
+  font-size: 1.6rem;
+  font-weight: 300;
+}
+
+.hero-progress {
+  position: relative;
+  width: 7rem;
+  height: 1px;
+  overflow: hidden;
+  background: rgba(245, 237, 224, 0.22);
+}
+
+.hero-progress span {
+  position: absolute;
+  inset: 0;
+  background: var(--hero-accent);
+  transform-origin: left;
+  animation: hero-progress linear both;
+}
+
+.hero-progress span.is-paused {
+  animation: none;
+  transform: scaleX(0);
+}
+
+.hero-arrows {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.hero-arrow {
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(245, 237, 224, 0.28);
+  border-radius: 50%;
+  background: rgba(10, 6, 2, 0.35);
+  color: var(--hero-text);
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: border-color 200ms ease, color 200ms ease, transform 200ms ease;
+}
+
+.hero-arrow svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.hero-arrow:hover {
+  border-color: var(--hero-accent);
+  color: var(--hero-accent);
+  transform: scale(1.06);
+}
+
+.hero-arrow:active {
+  transform: scale(0.94);
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 1.1rem;
+  left: 50%;
+  z-index: 4;
+  width: 1.5rem;
+  height: 2.4rem;
+  border: 1px solid rgba(245, 237, 224, 0.35);
+  border-radius: 999px;
+  transform: translateX(-50%);
+}
+
+.hero-scroll span {
+  position: absolute;
+  top: 0.45rem;
+  left: 50%;
+  width: 3px;
+  height: 0.45rem;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--hero-accent);
+  animation: hero-scroll-cue 1.8s ease-in-out infinite;
+}
+
+/* ===== Animaciones ===== */
+@keyframes hero-fade-in {
+  from { opacity: 0; }
+}
+
+@keyframes hero-word-in {
+  from {
+    opacity: 0;
+    transform: translateY(3rem) scale(0.96);
+  }
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(14px);
+  }
+}
+
+@keyframes hero-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes hero-ring-sway {
+  from { transform: translateZ(calc(var(--ring-r) * -1)) rotateY(-4deg) translateZ(var(--ring-r)); }
+  to { transform: translateZ(calc(var(--ring-r) * -1)) rotateY(4deg) translateZ(var(--ring-r)); }
+}
+
+/* Sin el marco ovalado el giro puede ser más amplio: se nota el volumen del empaque. */
+@keyframes hero-item-turn {
+  from { transform: perspective(1000px) rotateY(-14deg) rotateZ(-1.5deg) translateY(-8px); }
+  to { transform: perspective(1000px) rotateY(14deg) rotateZ(1.5deg) translateY(8px); }
+}
+
+@keyframes hero-particle-float {
+  from { transform: translate3d(0, -14px, 0) rotate(var(--rotate)); }
+  to { transform: translate3d(0, 14px, 0) rotate(calc(var(--rotate) + 25deg)); }
+}
+
+@keyframes hero-scroll-cue {
+  0% { opacity: 0; transform: translateY(0); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(0.8rem); }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .hero {
+    --item-h: min(50vh, 30rem, 100vw);
+    --item-h: min(50svh, 30rem, 100vw);
+  }
+
+  .hero-scroll {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .hero {
+    --item-h: min(42vh, 100vw);
+    --item-h: min(42svh, 100vw);
+    --ring-r: calc(var(--item-w) * 1.7);
+    --ring-step: 40deg;
+    --ring-y: 48%;
+
+    padding: calc(var(--nav-h) + 0.75rem) max(1.25rem, env(safe-area-inset-right)) 1.25rem max(1.25rem, env(safe-area-inset-left));
+  }
+
+  .hero-eyebrow {
+    margin-bottom: 0.5rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+  }
+
+  .hero-title {
+    font-size: clamp(1.6rem, 7.4vw, 2.2rem);
+  }
+
+  .hero-title em {
+    display: inline;
+  }
+
+  .hero-word span {
+    font-size: 36vw;
+  }
+
+  .hero-item[data-depth='2'] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .hero-bottom {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .hero-product-name {
+    font-size: 1.45rem;
+  }
+
+  .hero-product-description {
+    font-size: 0.82rem;
+  }
+
+  .hero-controls {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-right: 3.75rem;
+  }
+
+  .hero-arrow {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
+@media (hover: none) {
+  .hero-arrow:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-ring-sway,
+  .hero-item-body,
+  .hero-particle-shape,
+  .hero-scroll span,
+  .hero-word span,
+  .hero-product-content,
+  .hero-backdrop img {
+    animation: none !important;
+  }
+
+  .hero,
+  .hero-item,
+  .hero-item-image,
+  .hero-ring,
+  .hero-word,
+  .hero-particle {
+    transition-duration: 1ms !important;
+  }
+}
