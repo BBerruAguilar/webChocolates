@@ -1,10 +1,10 @@
 import { IMAGES } from '@/data/images'
 import type { Product } from '@/types/product'
-import leche30Elefante from '@/resources/chocolateLeche30/30gr_elefante.jpg'
-import leche30Guacamayo from '@/resources/chocolateLeche30/30gr_guacamayo.jpg'
-import leche30Mono from '@/resources/chocolateLeche30/30gr_mono.jpg'
-import leche30Perezoso from '@/resources/chocolateLeche30/30gr_peresoso.jpg'
-import leche30Tapir from '@/resources/chocolateLeche30/30gr_tapir.jpg'
+import leche30Elefante from '@/resources/chocolateLeche30/30gr_elefante.webp'
+import leche30Guacamayo from '@/resources/chocolateLeche30/30gr_guacamayo.webp'
+import leche30Mono from '@/resources/chocolateLeche30/30gr_mono.webp'
+import leche30Perezoso from '@/resources/chocolateLeche30/30gr_peresoso.webp'
+import leche30Tapir from '@/resources/chocolateLeche30/30gr_tapir.webp'
 
 const TINGO_MARIA = 'Tingo María, Perú'
 
