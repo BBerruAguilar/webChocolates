@@ -1,0 +1,678 @@
+/* Página "Arma tu caja de regalo": fondo verde bosque sólido, sin degradados. */
+.gift-page {
+  --gift-bg: #24391f;
+  --gift-ink: #f3eadb;
+  --gift-muted: rgba(243, 234, 219, 0.62);
+  --gift-line: rgba(243, 234, 219, 0.16);
+  --gift-accent: #e3b35c;
+  --kraft: #c9a77c;
+  --kraft-light: #dbbf95;
+  --kraft-dark: #9a774f;
+  --kraft-shadow: #7d5d3b;
+  --ribbon: #b8442a;
+
+  min-height: 100vh;
+  padding: calc(var(--nav-h) + 2.5rem) 2.5rem 5rem;
+  background: var(--gift-bg);
+  color: var(--gift-ink);
+}
+
+.gift-page :focus-visible {
+  outline-color: var(--gift-accent);
+}
+
+.gift-header {
+  max-width: 1200px;
+  margin: 0 auto 2.5rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--gift-line);
+}
+
+.gift-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+  color: var(--gift-muted);
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+
+.gift-back:hover {
+  color: var(--gift-ink);
+}
+
+.gift-back .icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.gift-header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-weight: 300;
+  line-height: 1.05;
+}
+
+.gift-header p {
+  max-width: 34rem;
+  margin-top: 0.75rem;
+  color: var(--gift-muted);
+  line-height: 1.6;
+}
+
+.gift-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 27rem) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(2rem, 5vw, 5rem);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.gift-builder {
+  position: sticky;
+  top: calc(var(--nav-h) + 1.5rem);
+}
+
+.gift-sizes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--gift-ink);
+  border-radius: 4px;
+}
+
+.gift-sizes button {
+  padding: 0.7rem 0.5rem;
+  border: 0;
+  border-left: 1px solid var(--gift-ink);
+  background: transparent;
+  color: var(--gift-ink);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.gift-sizes button:first-child {
+  border-left: 0;
+}
+
+.gift-sizes button strong {
+  font-size: 1rem;
+}
+
+.gift-sizes button.is-active {
+  background: var(--gift-ink);
+  color: var(--gift-bg);
+}
+
+/* ==========================================================================
+   Caja de cartón 3D
+   Todas las medidas en % del ancho/alto de la escena, así escala con la pantalla.
+   ========================================================================== */
+.box3d {
+  position: relative;
+  width: 100%;
+  margin-top: 2.5rem;
+  aspect-ratio: 1 / 0.95;
+  perspective: 1000px;
+  perspective-origin: 50% -30%;
+}
+
+.box3d.is-bump {
+  animation: box-bump 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.box3d.is-shake {
+  animation: box-shake 420ms ease;
+}
+
+.box3d-shadow {
+  position: absolute;
+  right: 6%;
+  bottom: 2%;
+  left: 6%;
+  height: 7%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  filter: blur(10px);
+}
+
+/* Interior: pared del fondo y piso, en dos tonos planos. */
+.box3d-back,
+.box3d-floor {
+  position: absolute;
+  right: 3%;
+  left: 3%;
+}
+
+.box3d-back {
+  top: 29%;
+  height: 12%;
+  border-radius: 4px 4px 0 0;
+  background: var(--kraft-dark);
+}
+
+.box3d-floor {
+  top: 41%;
+  height: 16%;
+  background: var(--kraft-shadow);
+}
+
+/* Tabletas paradas dentro de la caja: el frente tapa la parte de abajo. */
+.box3d-item {
+  position: absolute;
+  bottom: calc(100% - var(--bottom));
+  left: var(--x);
+  width: 22%;
+  aspect-ratio: 3 / 4;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform: translateX(-50%) scale(var(--scale)) rotate(var(--tilt));
+  transform-origin: bottom center;
+}
+
+.box3d-item.is-empty {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.box3d-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 3px solid #fffaf2;
+  border-radius: 3px;
+  box-shadow: 0 6px 12px rgba(46, 27, 16, 0.35);
+  object-fit: cover;
+  opacity: 0;
+}
+
+/* La tableta "cae" dentro de la caja cuando termina el tiro. */
+.box3d-item.is-landed img {
+  opacity: 1;
+  animation: box-item-drop 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.box3d-item.is-landed:hover img {
+  transform: translateY(-8%);
+  transition: transform 200ms ease;
+}
+
+.box3d-front {
+  position: absolute;
+  top: 56%;
+  right: 0;
+  left: 0;
+  height: 36%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 1.1rem;
+  gap: 0.2rem;
+  border-top: 5px solid var(--kraft-light);
+  border-radius: 0 0 6px 6px;
+  background: var(--kraft);
+  color: rgba(46, 27, 16, 0.7);
+}
+
+.box3d-brand {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+}
+
+.box3d-brand-sub {
+  padding-top: 0.3rem;
+  border-top: 1px solid rgba(46, 27, 16, 0.3);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Tapa con bisagra atrás: abierta queda inclinada hacia atrás; cerrada cubre la caja. */
+.box3d-lid {
+  position: absolute;
+  top: 27%;
+  right: -2%;
+  left: -2%;
+  z-index: 5;
+  height: 31%;
+  padding: 0;
+  border: 0;
+  border-bottom: 9px solid var(--kraft);
+  border-radius: 5px;
+  background: var(--kraft-light);
+  cursor: default;
+  transform: rotateX(-118deg);
+  transform-origin: top center;
+  transition: transform 700ms cubic-bezier(0.5, 1.4, 0.5, 1);
+}
+
+.box3d.is-closed .box3d-lid {
+  cursor: pointer;
+  transform: rotateX(0deg);
+}
+
+.box3d-lid-print {
+  color: rgba(46, 27, 16, 0.55);
+  font-family: var(--font-display);
+  font-size: clamp(0.9rem, 2vw, 1.15rem);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.box3d.is-closed .box3d-lid-print {
+  opacity: 1;
+  transition-delay: 350ms;
+}
+
+/* ===== Lazo: se ata después de cerrar la tapa ===== */
+.box3d-ribbon {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.box3d-ribbon-v {
+  position: absolute;
+  top: 27%;
+  left: 74%;
+  width: 7%;
+  height: 65%;
+  background: var(--ribbon);
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
+.box3d-ribbon-h {
+  position: absolute;
+  top: 78%;
+  right: 0;
+  left: 0;
+  height: 7%;
+  background: var(--ribbon);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.box3d-bow {
+  position: absolute;
+  top: 17%;
+  left: 77.5%;
+  width: 34%;
+  fill: var(--ribbon);
+  transform: translateX(-50%) scale(0);
+}
+
+.box3d-tag {
+  position: absolute;
+  top: 30%;
+  right: 28%;
+  padding: 0.35rem 0.6rem;
+  border-radius: 2px;
+  background: #fffaf2;
+  color: #2e1b10;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0;
+  transform: rotate(-8deg) translateY(-6px);
+  transform-origin: top right;
+}
+
+.box3d.has-ribbon .box3d-ribbon-v {
+  transform: scaleY(1);
+  transition: transform 350ms ease-out 650ms;
+}
+
+.box3d.has-ribbon .box3d-ribbon-h {
+  transform: scaleX(1);
+  transition: transform 350ms ease-out 850ms;
+}
+
+.box3d.has-ribbon .box3d-bow {
+  transform: translateX(-50%) scale(1);
+  transition: transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1) 1100ms;
+}
+
+.box3d.has-ribbon .box3d-tag {
+  opacity: 1;
+  transform: rotate(-8deg);
+  transition: opacity 300ms ease 1400ms, transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1) 1400ms;
+}
+
+@keyframes box-item-drop {
+  from { transform: translateY(-45%); }
+  70% { transform: translateY(5%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes box-bump {
+  0% { transform: scale(1, 1); }
+  40% { transform: scale(1.02, 0.97) translateY(1.5%); }
+  100% { transform: scale(1, 1); }
+}
+
+@keyframes box-shake {
+  25% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+  75% { transform: rotate(-1.5deg); }
+}
+
+/* ===== Estado y dedicatoria ===== */
+.gift-count {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.gift-count span {
+  color: var(--gift-muted);
+  font-size: 0.75rem;
+}
+
+.gift-ready {
+  color: var(--gift-accent);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 400;
+  animation: gift-ready-in 500ms ease 1500ms both;
+}
+
+.gift-card {
+  margin-top: 1.25rem;
+  padding: 1rem 1.1rem;
+  background: #fffaf2;
+  color: #2e1b10;
+  transform: rotate(-1.5deg);
+}
+
+.gift-card-to {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.gift-card-message {
+  margin-top: 0.4rem;
+  color: rgba(46, 27, 16, 0.8);
+  font-family: var(--font-display);
+  font-style: italic;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.gift-card-from {
+  margin-top: 0.6rem;
+  color: rgba(46, 27, 16, 0.6);
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+/* ===== Opciones ===== */
+.gift-options {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.gift-options h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.gift-options h2 span {
+  display: grid;
+  width: 1.9rem;
+  height: 1.9rem;
+  place-items: center;
+  border: 1px solid var(--gift-ink);
+  border-radius: 50%;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+}
+
+.gift-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 1rem;
+}
+
+.gift-product {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-family: var(--font-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.gift-product img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 3px;
+  object-fit: cover;
+  transition: transform 200ms ease;
+}
+
+.gift-product:hover img {
+  transform: translateY(-4px) rotate(-1.5deg);
+}
+
+.gift-product:active img {
+  transform: scale(0.95);
+}
+
+.gift-product-name {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+.gift-product-detail {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+  color: var(--gift-muted);
+  font-size: 0.75rem;
+}
+
+.gift-product-detail strong {
+  color: var(--gift-ink);
+  font-weight: 500;
+}
+
+.gift-product-count {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: grid;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  padding: 0 0.35rem;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--gift-accent);
+  color: #2e1b10;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.gift-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.gift-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  color: var(--gift-muted);
+  font-size: 0.75rem;
+}
+
+.gift-field-wide {
+  grid-column: 1 / -1;
+}
+
+.gift-fields input,
+.gift-fields textarea {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--gift-line);
+  border-radius: 4px;
+  background: rgba(243, 234, 219, 0.06);
+  color: var(--gift-ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.gift-fields input::placeholder,
+.gift-fields textarea::placeholder {
+  color: rgba(243, 234, 219, 0.4);
+}
+
+.gift-fields input:focus,
+.gift-fields textarea:focus {
+  border-color: var(--gift-ink);
+  outline: none;
+}
+
+.gift-fields small {
+  align-self: flex-end;
+}
+
+.gift-summary {
+  border-top: 1px solid var(--gift-line);
+  list-style: none;
+}
+
+.gift-summary li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--gift-line);
+  font-size: 0.9rem;
+}
+
+.gift-summary-total {
+  font-size: 1rem;
+}
+
+.gift-summary-total strong {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.gift-order {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border: 0;
+  border-radius: 4px;
+  background: var(--gift-ink);
+  color: var(--gift-bg);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.gift-order:disabled {
+  background: rgba(243, 234, 219, 0.14);
+  color: var(--gift-muted);
+  cursor: not-allowed;
+}
+
+.gift-order .icon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+/* Copia de la tableta que vuela hacia la caja. */
+.thrown-image.is-gift {
+  border: 3px solid #fffaf2;
+  box-shadow: 0 14px 26px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes gift-ready-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 860px) {
+  .gift-page {
+    padding: calc(var(--nav-h) + 1.5rem) max(1.25rem, env(safe-area-inset-right)) 4rem max(1.25rem, env(safe-area-inset-left));
+  }
+
+  .gift-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gift-builder {
+    position: static;
+    width: 100%;
+    max-width: 24rem;
+    margin: 0 auto;
+  }
+
+  /* En móvil los chocolates van en una fila deslizable, justo debajo de la caja. */
+  .gift-products {
+    display: flex;
+    margin: 0 calc(-1 * max(1.25rem, env(safe-area-inset-left)));
+    padding: 0 max(1.25rem, env(safe-area-inset-left)) 0.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+  }
+
+  .gift-product {
+    flex: 0 0 8.5rem;
+    scroll-snap-align: start;
+  }
+
+  .gift-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .box3d,
+  .box3d-item img,
+  .gift-ready {
+    animation: none !important;
+  }
+
+  .box3d-lid,
+  .box3d-ribbon *,
+  .box3d-ribbon-v,
+  .box3d-ribbon-h {
+    transition: none !important;
+  }
+}

@@ -1,0 +1,76 @@
+.gift-banner {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 4rem 2.5rem 0;
+}
+
+.gift-banner-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem 3rem;
+  padding: 2.25rem 2.5rem;
+  border: 1px solid rgba(46, 27, 16, 0.18);
+  border-radius: 4px;
+  background: #f3eadb;
+  color: #2e1b10;
+}
+
+.gift-banner-eyebrow {
+  color: #a94a25;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.gift-banner h2 {
+  margin-top: 0.4rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 300;
+}
+
+.gift-banner-text {
+  margin-top: 0.4rem;
+  color: rgba(46, 27, 16, 0.65);
+  font-size: 0.92rem;
+}
+
+.gift-banner-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1.4rem;
+  border-radius: 4px;
+  background: #2e1b10;
+  color: #f3eadb;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background 200ms ease;
+}
+
+.gift-banner-link:hover {
+  background: #4a2c1a;
+}
+
+.gift-banner-link .icon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+@media (max-width: 600px) {
+  .gift-banner {
+    padding: 3rem max(1.25rem, env(safe-area-inset-right)) 0 max(1.25rem, env(safe-area-inset-left));
+  }
+
+  .gift-banner-inner {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .gift-banner-link {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -39,9 +39,13 @@ export type ProductFamily = {
   image: string
   /** Ids de las presentaciones (data/products.ts), en el orden en que se muestran. */
   presentationIds: number[]
+  /** Qué aparece al "desenvolver" el empaque (se dibuja si no hay foto en resources/desenvuelto). */
+  contents: FamilyContents
   accentColor: string
   background: string
 }
+
+export type FamilyContents = 'tableta' | 'grageas' | 'polvo' | 'cascarilla'
 
 export type BrandFilter = 'Todos' | Brand
 

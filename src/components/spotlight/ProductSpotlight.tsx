@@ -9,6 +9,8 @@ import './ProductSpotlight.css'
 type ProductSpotlightProps = {
   family: ProductFamily
   onZoom: (product: Product) => void
+  /** Abre el empaque del producto central ("desenvolver"). */
+  onUnwrap: (family: ProductFamily) => void
 }
 
 /**
@@ -16,7 +18,7 @@ type ProductSpotlightProps = {
  * nombre al otro y, en la esquina, el botón que expulsa sus presentaciones hacia las tarjetas.
  * Se monta con `key={family.id}`, así al cambiar de producto vuelve a su estado inicial.
  */
-export function ProductSpotlight({ family, onZoom }: ProductSpotlightProps) {
+export function ProductSpotlight({ family, onZoom, onUnwrap }: ProductSpotlightProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const figureRef = useRef<HTMLImageElement>(null)
   const [open, setOpen] = useState(false)
@@ -46,7 +48,18 @@ export function ProductSpotlight({ family, onZoom }: ProductSpotlightProps) {
 
         <div className="spotlight-figure">
           <span className="spotlight-glow" aria-hidden="true" />
-          <img ref={figureRef} className="spotlight-image" src={family.image} alt={family.name} data-flight-target />
+          <button
+            type="button"
+            className="spotlight-unwrap"
+            onClick={() => onUnwrap(family)}
+            aria-label={`Abrir el empaque de ${family.name}`}
+            title="Abrir empaque"
+          >
+            <img ref={figureRef} className="spotlight-image" src={family.image} alt={family.name} data-flight-target />
+          </button>
+          <span className="spotlight-unwrap-hint" aria-hidden="true">
+            Toca para abrir
+          </span>
           <span className="spotlight-floor" aria-hidden="true" />
         </div>
 

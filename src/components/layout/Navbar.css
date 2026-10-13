@@ -22,6 +22,11 @@
   backdrop-filter: blur(16px) saturate(1.3);
 }
 
+/* Página de regalo: mismo verde del fondo, un poco más oscuro. */
+.site-nav.is-solid {
+  background: #1b2c17;
+}
+
 .site-brand {
   color: inherit;
   font-family: var(--font-display);

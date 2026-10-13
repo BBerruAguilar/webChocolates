@@ -1,18 +1,23 @@
 import { CartButton } from '@/components/cart/CartButton'
-import { BagIcon, LeafIcon, WhatsAppIcon } from '@/components/icons/Icons'
+import { BagIcon, GiftIcon, LeafIcon, WhatsAppIcon } from '@/components/icons/Icons'
 import { NAV_LINKS, SITE } from '@/config/site'
 import { useScrolledPast } from '@/hooks/useScrolledPast'
 import { WHATSAPP_CONTACT_URL } from '@/services/whatsapp'
 import './Navbar.css'
 
-const NAV_ICONS = { bag: BagIcon, leaf: LeafIcon }
+const NAV_ICONS = { bag: BagIcon, gift: GiftIcon, leaf: LeafIcon }
 
-export function Navbar() {
+type NavbarProps = {
+  /** Fondo siempre visible (en páginas de fondo claro, donde el menú transparente no se leería). */
+  solid?: boolean
+}
+
+export function Navbar({ solid = false }: NavbarProps) {
   // Transparente sobre el inicio; al bajar toma un fondo de vidrio para seguir siendo legible.
-  const scrolled = useScrolledPast(40)
+  const scrolled = useScrolledPast(40) || solid
 
   return (
-    <nav className={`site-nav${scrolled ? ' is-scrolled' : ''}`}>
+    <nav className={`site-nav${scrolled ? ' is-scrolled' : ''}${solid ? ' is-solid' : ''}`}>
       <a className="site-brand" href="#inicio">
         {SITE.name}
       </a>
