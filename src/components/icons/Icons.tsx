@@ -65,6 +65,15 @@ export function PlusIcon({ className }: IconProps) {
   )
 }
 
+export function SearchIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.6-3.6" />
+    </StrokeIcon>
+  )
+}
+
 /** Caja de regalo con lazo. */
 export function GiftIcon({ className }: IconProps) {
   return (
@@ -104,6 +113,26 @@ export function ExpandIcon({ className }: IconProps) {
   )
 }
 
+/** Compartir: tres nodos unidos. */
+export function ShareIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <circle cx="18" cy="5" r="2.5" />
+      <circle cx="6" cy="12" r="2.5" />
+      <circle cx="18" cy="19" r="2.5" />
+      <path d="m8.2 13.3 7.6 4.4M15.8 6.3l-7.6 4.4" />
+    </StrokeIcon>
+  )
+}
+
+export function CheckIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M5 12.5 10 17.5 19 7" />
+    </StrokeIcon>
+  )
+}
+
 export function WhatsAppIcon({ className }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
@@ -112,10 +141,12 @@ export function WhatsAppIcon({ className }: IconProps) {
   )
 }
 
-export function ChevronIcon({ direction, className }: IconProps & { direction: 'left' | 'right' }) {
+const CHEVRON_PATHS = { left: 'M15 5l-7 7 7 7', right: 'M9 5l7 7-7 7', down: 'M5 9l7 7 7-7' }
+
+export function ChevronIcon({ direction, className }: IconProps & { direction: keyof typeof CHEVRON_PATHS }) {
   return (
     <StrokeIcon className={className}>
-      <path d={direction === 'left' ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'} />
+      <path d={CHEVRON_PATHS[direction]} />
     </StrokeIcon>
   )
 }

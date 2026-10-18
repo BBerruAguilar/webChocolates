@@ -24,7 +24,7 @@ export const backgroundShapes: BackgroundShape[] = [
   { type: 'bean', left: '24%', top: '38%', width: 48, dx: '25px', dy: '45px', r0: '40deg', r1: '70deg', duration: '48s', delay: '-26s', hideOnMobile: true },
 ]
 
-/** Partículas del hero: `depth` controla cuánto se mueven con el puntero y su desenfoque. */
+/** Partículas del hero: `depth` controla su desenfoque y si pasan por delante del anillo. */
 export type HeroParticle = {
   type: CacaoShapeType
   left: string

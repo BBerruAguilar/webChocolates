@@ -112,7 +112,6 @@ export function CacaoJourney() {
     >
       <div className="journey-sticky">
         <header className="journey-header">
-          <p className="journey-eyebrow">Nosotros</p>
           <h2 id="journey-title" className="journey-title">
             Del grano a la barra
           </h2>
@@ -127,7 +126,7 @@ export function CacaoJourney() {
                 aria-current={index === active ? 'step' : undefined}
                 onClick={() => goTo(index)}
               >
-                <span>{item.number}</span>
+                <span className="journey-dot" aria-hidden="true" />
                 {item.title}
               </button>
             </li>
@@ -163,9 +162,6 @@ export function CacaoJourney() {
 
         <div className="journey-copy" aria-live="polite">
           <div key={stage.id} className="journey-copy-inner">
-            <span className="journey-number">
-              {stage.number} <small>/ {String(total).padStart(2, '0')}</small>
-            </span>
             <h3>{stage.title}</h3>
             <p>{stage.text}</p>
           </div>

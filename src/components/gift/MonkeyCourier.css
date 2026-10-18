@@ -1,0 +1,91 @@
+/* El mono cuelga de una liana fija arriba de la pantalla: el giro es desde ese punto. */
+.monkey-rig {
+  position: fixed;
+  z-index: 60;
+  pointer-events: none;
+  transform-origin: 50% 0;
+  will-change: transform;
+}
+
+.monkey-vine {
+  position: absolute;
+  top: 0;
+  bottom: calc(var(--monkey-height) - 6%);
+  left: calc(50% - 2.5px);
+  width: 5px;
+  border-radius: 3px;
+  background: #6f8a3c;
+}
+
+.monkey-leaf {
+  position: absolute;
+  bottom: 30%;
+  width: 28px;
+  height: 14px;
+  border-radius: 0 100% 0 100%;
+  background: #8aa64a;
+}
+
+.monkey-leaf.is-left {
+  right: 3px;
+  transform: rotate(-20deg);
+}
+
+.monkey-leaf.is-right {
+  bottom: 55%;
+  left: 3px;
+  transform: scaleX(-1) rotate(-20deg);
+}
+
+.monkey-art {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--monkey-height);
+  overflow: visible;
+}
+
+.monkey-fur {
+  fill: #6b3f22;
+}
+
+.monkey-skin {
+  fill: #f0d6b0;
+}
+
+.monkey-hand {
+  fill: #c98f5e;
+}
+
+.monkey-eye {
+  fill: #1b120b;
+}
+
+.monkey-mouth {
+  fill: none;
+  stroke: #6b3f22;
+  stroke-linecap: round;
+  stroke-width: 2.5;
+}
+
+.monkey-limb {
+  fill: none;
+  stroke: #6b3f22;
+  stroke-linecap: round;
+  stroke-width: 13;
+}
+
+.monkey-tail {
+  fill: none;
+  stroke: #5a331b;
+  stroke-linecap: round;
+  stroke-width: 8;
+  transform-origin: 80px 176px;
+  animation: monkey-tail 900ms ease-in-out infinite alternate;
+}
+
+@keyframes monkey-tail {
+  from { transform: rotate(-6deg); }
+  to { transform: rotate(8deg); }
+}

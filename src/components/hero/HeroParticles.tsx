@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react'
 import { CacaoShape } from '@/components/decor/CacaoShape'
 import { heroParticles } from '@/data/backgroundShapes'
 
-/** Granos y hojas a distintas profundidades: los cercanos se ven grandes, desenfocados y se mueven más. */
+/** Granos y hojas a distintas profundidades: los cercanos se ven grandes y desenfocados. */
 export function HeroParticles() {
   return (
     <div className="hero-particles" aria-hidden="true">

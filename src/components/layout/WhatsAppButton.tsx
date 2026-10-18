@@ -2,6 +2,7 @@ import { WhatsAppIcon } from '@/components/icons/Icons'
 import { WHATSAPP_CONTACT_URL } from '@/services/whatsapp'
 import './WhatsAppButton.css'
 
+/** Contacto directo: círculo verde que al pasar el mouse se abre en una píldora con texto. */
 export function WhatsAppButton() {
   return (
     <a
@@ -9,11 +10,14 @@ export function WhatsAppButton() {
       href={WHATSAPP_CONTACT_URL}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Comunicarse directamente con el vendedor por WhatsApp"
+      aria-label="Escríbenos por WhatsApp"
     >
-      <WhatsAppIcon />
-      <span className="whatsapp-tooltip" role="tooltip">
-        Comunícate directamente con el vendedor
+      <span className="whatsapp-label" aria-hidden="true">
+        <strong>Escríbenos</strong>
+        <small>Te respondemos al toque</small>
+      </span>
+      <span className="whatsapp-badge" aria-hidden="true">
+        <WhatsAppIcon />
       </span>
     </a>
   )

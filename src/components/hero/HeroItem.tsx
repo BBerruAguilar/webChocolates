@@ -25,7 +25,7 @@ export function HeroItem({ family, index, offset, wrapping, priority, onSelect }
       type="button"
       className={`hero-item${wrapping ? ' is-wrapping' : ''}`}
       data-depth={depth}
-      style={{ '--offset': parked } as CSSProperties}
+      style={{ '--offset': parked, '--item-scale': family.heroScale ?? 1 } as CSSProperties}
       onClick={onSelect}
       tabIndex={isFront ? 0 : -1}
       aria-hidden={!isFront}
@@ -34,15 +34,19 @@ export function HeroItem({ family, index, offset, wrapping, priority, onSelect }
       <span className="hero-item-shadow" />
       {/* Retraso fijo por índice: cada producto gira lentamente desfasado de los demás. */}
       <span className="hero-item-body" style={{ animationDelay: `${index * -1.7}s` }}>
-        <img
-          className="hero-item-image"
-          src={family.image}
-          alt=""
-          draggable={false}
-          decoding="async"
-          fetchPriority={priority ? 'high' : 'auto'}
-          {...(isFront ? { 'data-flight-source': '' } : {})}
-        />
+        <span className="hero-item-figure">
+          <img
+            className="hero-item-image"
+            src={family.image}
+            alt=""
+            draggable={false}
+            decoding="async"
+            fetchPriority={priority ? 'high' : 'auto'}
+            {...(isFront ? { 'data-flight-source': '' } : {})}
+          />
+          {/* Luz del foco sobre el empaque, recortada con la silueta del producto. */}
+          <span className="hero-item-light" style={{ '--item-src': `url("${family.image}")` } as CSSProperties} />
+        </span>
       </span>
     </button>
   )

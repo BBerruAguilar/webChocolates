@@ -1,11 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Caveat:wght@500&family=Figtree:wght@400;500;600&family=Instrument+Serif:ital@1&display=swap');
 @import 'tailwindcss';
 
 /* Los estilos de cada sección viven junto a su componente (src/components/**). */
 
 @theme {
-  --font-display: 'Fraunces', serif;
-  --font-body: 'DM Sans', sans-serif;
+  /*
+   * Opción "Artesanal con carácter": Bricolage Grotesque en títulos, Instrument Serif en cursiva
+   * para acentos ("de la selva"), Figtree para textos y Caveat para lo escrito a mano.
+   */
+  --font-display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --font-accent: 'Instrument Serif', Georgia, serif;
+  --font-body: 'Figtree', 'Segoe UI', system-ui, sans-serif;
+  --font-hand: 'Caveat', 'Segoe Print', cursive;
 
   --color-cream: #d6c2a2;
   --color-stone: #d6c3a1;
@@ -29,6 +35,10 @@
   --c-linea: #d6c3a1;        /* bordes suaves */
   --c-linea-fuerte: rgba(46, 27, 16, 0.28);
   --c-crema: var(--c-fondo);
+
+  /* Grosores de los títulos: Bricolage luce con más peso que la Fraunces fina de antes. */
+  --weight-display: 500;
+  --weight-display-strong: 600;
 
   --nav-h: 5rem;             /* alto del menú; el hero ocupa el resto del viewport */
 }

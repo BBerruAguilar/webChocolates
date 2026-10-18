@@ -4,12 +4,14 @@ En imágenes sin fondo también recorta el margen transparente sobrante.
 Las imágenes originales NO se modifican; el código importa las versiones .webp.
 
 Uso (desde la raíz del proyecto):
-    python scripts/optimize-images.py
+    python scripts/optimize-images.py            # solo imágenes nuevas o modificadas
+    python scripts/optimize-images.py --force    # vuelve a generar todas
 
 Requiere Pillow:  pip install pillow
 Solo procesa imágenes nuevas o modificadas (compara fechas), así que se puede correr siempre.
 """
 
+import sys
 from pathlib import Path
 
 from PIL import Image, ImageOps
@@ -20,9 +22,9 @@ MAX_SIDE = 1400  # px: suficiente para pantallas retina sin pesar de más
 QUALITY = 82
 
 
-def optimize(source: Path) -> None:
+def optimize(source: Path, force: bool) -> None:
     target = source.with_suffix(".webp")
-    if target.exists() and target.stat().st_mtime >= source.stat().st_mtime:
+    if not force and target.exists() and target.stat().st_mtime >= source.stat().st_mtime:
         return
 
     with Image.open(source) as image:
@@ -45,7 +47,7 @@ def optimize(source: Path) -> None:
 def main() -> None:
     sources = [p for p in ROOT.rglob("*") if p.suffix.lower() in SOURCE_EXTENSIONS]
     for source in sorted(sources):
-        optimize(source)
+        optimize(source, force="--force" in sys.argv)
     print(f"Listo: {len(sources)} imágenes revisadas en {ROOT}")
 
 

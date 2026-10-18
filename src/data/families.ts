@@ -22,6 +22,7 @@ export const families: ProductFamily[] = [
     image: leche30,
     presentationIds: [33, 34, 30, 31, 32],
     contents: 'tableta',
+    heroScale: 0.85,
     accentColor: '#ff8a80',
     background: '#3a1414',
   },
@@ -33,6 +34,7 @@ export const families: ProductFamily[] = [
     image: leche80,
     presentationIds: [12, 8, 10, 13, 9, 3, 5],
     contents: 'tableta',
+    heroScale: 0.85,
     accentColor: '#ffb74d',
     background: '#3a1f05',
   },
@@ -55,6 +57,7 @@ export const families: ProductFamily[] = [
     image: grageas,
     presentationIds: [17, 2, 18, 19, 20, 21],
     contents: 'grageas',
+    heroScale: 0.8,
     accentColor: '#f1a24c',
     background: '#4a2408',
   },
@@ -77,6 +80,7 @@ export const families: ProductFamily[] = [
     image: cacaoPolvo,
     presentationIds: [24],
     contents: 'polvo',
+    heroScale: 0.8,
     accentColor: '#d8ad66',
     background: '#3f2412',
   },
@@ -88,6 +92,7 @@ export const families: ProductFamily[] = [
     image: cascarilla,
     presentationIds: [23],
     contents: 'cascarilla',
+    heroScale: 0.8,
     accentColor: '#91c66d',
     background: '#1f3310',
   },
@@ -109,6 +114,11 @@ export function getUnwrappedImage(family: ProductFamily) {
   })
   // Si existe la versión optimizada .webp, se prefiere.
   return (matches.find(([path]) => path.endsWith('.webp')) ?? matches[0])?.[1]
+}
+
+/** Producto principal al que pertenece una presentación (para filtrar el catálogo). */
+export function getFamilyOf(productId: number) {
+  return families.find(family => family.presentationIds.includes(productId))
 }
 
 export function getPresentations(family: ProductFamily): Product[] {

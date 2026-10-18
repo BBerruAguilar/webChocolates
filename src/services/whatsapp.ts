@@ -27,13 +27,12 @@ export function buildOrderMessage(lines: CartLine[]) {
 export type GiftOrder = {
   size: number
   lines: CartLine[]
-  boxPrice: number
   to: string
   from: string
   message: string
 }
 
-export function buildGiftMessage({ size, lines, boxPrice, to, from, message }: GiftOrder) {
+export function buildGiftMessage({ size, lines, to, from, message }: GiftOrder) {
   const chocolates = cartTotal(lines)
   const dedication = [
     to && `Para: ${to}`,
@@ -48,10 +47,8 @@ export function buildGiftMessage({ size, lines, boxPrice, to, from, message }: G
     '',
     ...(dedication.length ? ['Dedicatoria', ...dedication, ''] : []),
     `Chocolates: ${formatPrice(chocolates)}`,
-    boxPrice > 0 ? `Caja: ${formatPrice(boxPrice)}` : 'Caja: por confirmar',
-    boxPrice > 0 ? `Total: ${formatPrice(chocolates + boxPrice)}` : '',
     '',
-    '¿Me confirman la disponibilidad y el total, por favor?',
+    '¿Me confirman la disponibilidad y el precio de la caja, por favor?',
   ]
     .filter((line, index, all) => line !== '' || all[index - 1] !== '')
     .join('\n')

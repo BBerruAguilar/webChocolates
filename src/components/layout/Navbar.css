@@ -31,7 +31,7 @@
   color: inherit;
   font-family: var(--font-display);
   font-size: 1.45rem;
-  font-weight: 400;
+  font-weight: var(--weight-display-strong);
   letter-spacing: 0.01em;
   text-decoration: none;
   white-space: nowrap;
@@ -43,49 +43,69 @@
   gap: 0.5rem;
 }
 
-.site-nav-icon {
+/*
+ * Íconos del menú (y el carrito): una píldora que en reposo es un círculo. Al pasar el mouse
+ * se ensancha hacia la izquierda y el nombre sale deslizándose desde el ícono.
+ */
+.site-nav-icon,
+.site-nav .cart-summary {
   position: relative;
-  display: grid;
-  width: 2.6rem;
+  display: inline-flex;
+  width: auto;
+  min-width: 2.6rem;
   height: 2.6rem;
-  place-items: center;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 0.65rem;
+  border: 0;
   border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
   color: inherit;
-  transition: background 200ms ease, color 200ms ease;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background 250ms ease, color 200ms ease;
 }
 
-.site-nav-icon .icon {
+.site-nav-icon .icon,
+.site-nav .cart-summary .cart-icon {
   width: 1.3rem;
   height: 1.3rem;
+  flex: 0 0 auto;
 }
 
-.site-nav-icon:hover {
-  background: rgba(245, 237, 224, 0.12);
-}
-
-/* Etiqueta del ícono al pasar el mouse o con el teclado. */
-.site-nav-icon::after {
-  position: absolute;
-  top: calc(100% + 0.4rem);
-  left: 50%;
-  padding: 0.35rem 0.6rem;
-  border-radius: 6px;
-  background: rgba(18, 11, 6, 0.85);
-  color: #f5ede0;
-  content: attr(data-tooltip);
-  font-size: 0.65rem;
-  letter-spacing: 0.06em;
+.site-nav-label {
+  max-width: 0;
+  overflow: hidden;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   white-space: nowrap;
   opacity: 0;
-  pointer-events: none;
-  transform: translate(-50%, -0.25rem);
-  transition: opacity 160ms ease, transform 160ms ease;
+  /* Empieza escondido detrás del ícono y sale hacia la izquierda. */
+  transform: translateX(0.75rem);
+  transition:
+    max-width 380ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    margin 380ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    opacity 220ms ease,
+    transform 380ms cubic-bezier(0.22, 0.8, 0.2, 1);
 }
 
-.site-nav-icon:hover::after,
-.site-nav-icon:focus-visible::after {
+.site-nav-icon:hover,
+.site-nav-icon:focus-visible,
+.site-nav .cart-summary:hover,
+.site-nav .cart-summary:focus-visible {
+  background: rgba(245, 237, 224, 0.14);
+}
+
+.site-nav-icon:hover .site-nav-label,
+.site-nav-icon:focus-visible .site-nav-label,
+.site-nav .cart-summary:hover .site-nav-label,
+.site-nav .cart-summary:focus-visible .site-nav-label {
+  max-width: 8rem;
+  margin-right: 0.5rem;
   opacity: 1;
-  transform: translate(-50%, 0);
+  transform: none;
 }
 
 .site-nav :focus-visible {
@@ -105,14 +125,160 @@
     gap: 0.15rem;
   }
 
-  .site-nav-icon {
-    width: 2.3rem;
+  .site-nav-icon,
+  .site-nav .cart-summary {
+    min-width: 2.3rem;
     height: 2.3rem;
+    padding: 0 0.5rem;
+  }
+
+  /* En celular ya está el botón flotante de WhatsApp: aquí sobra y el menú no cabría. */
+  .site-nav-icon.is-whatsapp {
+    display: none;
   }
 }
 
-@media (hover: none) {
-  .site-nav-icon::after {
+/* ===== Menú hamburguesa (solo celular) ===== */
+.site-nav-toggle {
+  display: none;
+  width: 2.3rem;
+  height: 2.3rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.site-nav-toggle span {
+  display: block;
+  width: 1.2rem;
+  height: 1.5px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform 300ms cubic-bezier(0.22, 0.8, 0.2, 1), opacity 200ms ease;
+}
+
+/* Abierto: las tres líneas forman una X. */
+.site-nav.is-menu-open .site-nav-toggle span:nth-child(1) {
+  transform: translateY(calc(0.3rem + 1.5px)) rotate(45deg);
+}
+
+.site-nav.is-menu-open .site-nav-toggle span:nth-child(2) {
+  opacity: 0;
+}
+
+.site-nav.is-menu-open .site-nav-toggle span:nth-child(3) {
+  transform: translateY(calc(-0.3rem - 1.5px)) rotate(-45deg);
+}
+
+.mobile-menu {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .site-nav-toggle {
+    display: inline-flex;
+  }
+
+  /* Los enlaces pasan al menú; en la barra quedan buscar, carrito y la hamburguesa. */
+  .site-nav-icon.is-link {
     display: none;
+  }
+
+  .site-nav.is-menu-open {
+    border-bottom-color: rgba(245, 237, 224, 0.08);
+    background: #1a0f08;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .mobile-menu {
+    position: fixed;
+    top: var(--nav-h);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 49;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.5rem max(1.25rem, env(safe-area-inset-right)) calc(1.5rem + env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+    background: #1a0f08;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 250ms ease, visibility 0s linear 250ms;
+  }
+
+  .mobile-menu.is-open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 250ms ease;
+  }
+
+  .mobile-menu ul {
+    list-style: none;
+  }
+
+  .mobile-menu li {
+    border-bottom: 1px solid rgba(245, 237, 224, 0.1);
+    opacity: 0;
+    transform: translateY(0.75rem);
+    transition: opacity 300ms ease, transform 400ms cubic-bezier(0.22, 0.8, 0.2, 1);
+  }
+
+  /* Los enlaces entran uno tras otro. */
+  .mobile-menu.is-open li {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(80ms + var(--i) * 60ms);
+  }
+
+  .mobile-menu a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.15rem 0.25rem;
+    color: #f5ede0;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: var(--weight-display);
+    text-decoration: none;
+  }
+
+  .mobile-menu a:active {
+    color: #e3b35c;
+  }
+
+  .mobile-menu .icon {
+    width: 1.4rem;
+    height: 1.4rem;
+    color: #e3b35c;
+  }
+
+  .mobile-menu-foot {
+    color: rgba(245, 237, 224, 0.45);
+    font-size: 0.8rem;
+  }
+}
+
+/* En pantallas táctiles no hay "pasar el mouse": los nombres no se despliegan. */
+@media (hover: none) {
+  .site-nav-label {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav-label,
+  .site-nav-toggle span,
+  .mobile-menu,
+  .mobile-menu li {
+    transition: none;
   }
 }

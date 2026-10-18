@@ -55,18 +55,11 @@
   border-bottom: 1px solid var(--journey-line);
 }
 
-.journey-eyebrow {
-  color: var(--journey-accent);
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
 
 .journey-title {
   font-family: var(--font-display);
   font-size: clamp(1.6rem, 3vw, 2.4rem);
-  font-weight: 300;
+  font-weight: var(--weight-display);
 }
 
 /* ===== Lista de etapas ===== */
@@ -83,7 +76,7 @@
 .journey-steps button {
   display: flex;
   width: 100%;
-  align-items: baseline;
+  align-items: center;
   gap: 0.9rem;
   padding: 0.55rem 0;
   border: 0;
@@ -97,10 +90,18 @@
   transition: color 250ms ease;
 }
 
-.journey-steps button span {
-  min-width: 1.5rem;
-  font-size: 0.7rem;
-  font-variant-numeric: tabular-nums;
+/* Punto que marca la etapa: se llena al pasar por ella. */
+.journey-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  flex: 0 0 auto;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  transition: background 250ms ease, transform 250ms ease;
+}
+
+.journey-steps button.is-done .journey-dot {
+  background: currentColor;
 }
 
 .journey-steps button.is-done {
@@ -113,8 +114,10 @@
   font-weight: 500;
 }
 
-.journey-steps button.is-active span {
-  color: var(--journey-accent);
+.journey-steps button.is-active .journey-dot {
+  border-color: var(--journey-accent);
+  background: var(--journey-accent);
+  transform: scale(1.4);
 }
 
 .journey-steps button:hover {
@@ -253,22 +256,11 @@
   animation: journey-copy-in 500ms cubic-bezier(0.22, 0.8, 0.2, 1) both;
 }
 
-.journey-number {
-  color: var(--journey-accent);
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-}
-
-.journey-number small {
-  color: var(--journey-muted);
-  font-size: 0.8rem;
-}
-
 .journey-copy h3 {
-  margin: 0.6rem 0 1rem;
+  margin: 0 0 1rem;
   font-family: var(--font-display);
   font-size: clamp(2.2rem, 4vw, 3.4rem);
-  font-weight: 300;
+  font-weight: var(--weight-display);
   line-height: 1;
 }
 
@@ -354,9 +346,14 @@
     font-size: 0;
   }
 
-  .journey-steps button span {
-    font-size: 0.75rem;
-    text-align: center;
+  /* En celular la lista de etapas es una fila de puntos. */
+  .journey-steps button {
+    border-bottom: 0;
+  }
+
+  .journey-dot {
+    width: 0.6rem;
+    height: 0.6rem;
   }
 
   .journey-progress {

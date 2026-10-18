@@ -1,6 +1,7 @@
 import { forwardRef, type AnimationEvent, type CSSProperties } from 'react'
 import { cloudinaryUrl } from '@/services/cloudinary'
 import type { Product } from '@/types/product'
+import './GiftBox3D.css'
 
 /** Un espacio de la caja: vacío o con una tableta (que puede ir todavía "en el aire"). */
 export type GiftSlot = { product: Product; landed: boolean } | null
@@ -78,7 +79,15 @@ export const GiftBox3D = forwardRef<HTMLDivElement, GiftBox3DProps>(function Gif
         )
       })}
 
+      {/* Papel de seda que asoma entre las tabletas. */}
+      <span className="box3d-tissue" aria-hidden="true" />
+
       <span className="box3d-front" aria-hidden="true">
+        <svg className="box3d-seal" viewBox="0 0 48 48">
+          <circle cx="24" cy="24" r="22" />
+          <path d="M24 9c6 4 8 11 7 18-1 6-4 10-7 12-3-2-6-6-7-12-1-7 1-14 7-18Z" />
+          <path d="M24 11v26M20 14c-2 7-2 15 1 21M28 14c2 7 2 15-1 21" />
+        </svg>
         <span className="box3d-brand">Wayu & Mikhuna</span>
         <span className="box3d-brand-sub">Chocolates artesanales</span>
       </span>

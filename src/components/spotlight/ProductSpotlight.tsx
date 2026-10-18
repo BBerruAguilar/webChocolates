@@ -37,7 +37,13 @@ export function ProductSpotlight({ family, onZoom, onUnwrap }: ProductSpotlightP
       id="destacado"
       ref={sectionRef}
       className={`spotlight${open ? ' is-open' : ''}`}
-      style={{ '--spot-accent': family.accentColor, '--spot-bg': family.background } as CSSProperties}
+      style={
+        {
+          '--spot-accent': family.accentColor,
+          '--spot-bg': family.background,
+          '--item-scale': family.heroScale ?? 1,
+        } as CSSProperties
+      }
       aria-labelledby="spotlight-name"
     >
       <div className="spotlight-stage">
@@ -57,9 +63,6 @@ export function ProductSpotlight({ family, onZoom, onUnwrap }: ProductSpotlightP
           >
             <img ref={figureRef} className="spotlight-image" src={family.image} alt={family.name} data-flight-target />
           </button>
-          <span className="spotlight-unwrap-hint" aria-hidden="true">
-            Toca para abrir
-          </span>
           <span className="spotlight-floor" aria-hidden="true" />
         </div>
 

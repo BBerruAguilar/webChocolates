@@ -41,13 +41,19 @@ export type ProductFamily = {
   presentationIds: number[]
   /** Qué aparece al "desenvolver" el empaque (se dibuja si no hay foto en resources/desenvuelto). */
   contents: FamilyContents
+  /**
+   * Ajuste de tamaño en el carrusel y la sección destacada (1 = normal, 0.8 = 20% más chico).
+   * Sirve para igualar productos cuya foto se ve más grande o más chica que el resto.
+   */
+  heroScale?: number
   accentColor: string
   background: string
 }
 
 export type FamilyContents = 'tableta' | 'grageas' | 'polvo' | 'cascarilla'
 
-export type BrandFilter = 'Todos' | Brand
+/** Filtro del catálogo: todos los productos o los de un producto principal (familia). */
+export type CatalogFilter = 'todos' | ProductFamily['id']
 
 export type CartLine = {
   product: Product

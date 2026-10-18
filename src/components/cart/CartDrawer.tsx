@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { CloseIcon, TrashIcon, WhatsAppIcon } from '@/components/icons/Icons'
+import { CartIcon, CloseIcon, GiftIcon, TrashIcon, WhatsAppIcon } from '@/components/icons/Icons'
 import { useCart } from '@/context/cart-context'
+import { ROUTE_HREF } from '@/hooks/useHashRoute'
 import { useModalBehavior } from '@/hooks/useModalBehavior'
 import { prefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 import { shakeCart, throwFromCart } from '@/services/cartAnimation'
@@ -24,19 +25,26 @@ function CartLineItem({ line, waiting }: { line: CartLine; waiting: boolean }) {
 
   return (
     <article className={`cart-item${waiting ? ' is-waiting' : ''}`}>
-      <img src={thumbnailUrl(line)} alt="" decoding="async" data-cart-slot={product.id} />
+      <div className="cart-item-media">
+        <img src={thumbnailUrl(line)} alt="" decoding="async" data-cart-slot={product.id} />
+      </div>
       <div className="cart-item-info">
-        <h3>{product.name}</h3>
+        <div className="cart-item-head">
+          <h3>{product.name}</h3>
+          <strong>{formatPrice(product.price * quantity)}</strong>
+        </div>
         <p>{product.subtitle}</p>
-        <strong>{formatPrice(product.price)}</strong>
-        <div className="quantity-controls" aria-label={`Cantidad de ${product.name}`}>
-          <button type="button" onClick={() => changeQuantity(product.id, -1)} aria-label={`Restar una unidad de ${product.name}`}>
-            −
-          </button>
-          <span aria-live="polite">{quantity}</span>
-          <button type="button" onClick={() => changeQuantity(product.id, 1)} aria-label={`Agregar una unidad de ${product.name}`}>
-            +
-          </button>
+        <div className="cart-item-foot">
+          <div className="quantity-controls" aria-label={`Cantidad de ${product.name}`}>
+            <button type="button" onClick={() => changeQuantity(product.id, -1)} aria-label={`Restar una unidad de ${product.name}`}>
+              −
+            </button>
+            <span aria-live="polite">{quantity}</span>
+            <button type="button" onClick={() => changeQuantity(product.id, 1)} aria-label={`Agregar una unidad de ${product.name}`}>
+              +
+            </button>
+          </div>
+          {quantity > 1 && <small className="cart-item-unit">{formatPrice(product.price)} c/u</small>}
           <button className="remove-item" type="button" onClick={() => remove(product.id)} aria-label={`Quitar ${product.name} del carrito`} title="Quitar">
             <TrashIcon className="icon" />
           </button>
@@ -52,6 +60,7 @@ function CartLineItem({ line, waiting }: { line: CartLine; waiting: boolean }) {
  */
 function CartPanel() {
   const { lines, total, close } = useCart()
+  const units = lines.reduce((sum, line) => sum + line.quantity, 0)
   const itemsRef = useRef<HTMLDivElement>(null)
   // Productos que todavía van en el aire (se calculan una sola vez, al abrir).
   const [waiting, setWaiting] = useState<ReadonlySet<number>>(() =>
@@ -96,11 +105,11 @@ function CartPanel() {
     <div className="cart-overlay" role="dialog" aria-modal="true" aria-label="Carrito de compras" onClick={close}>
       <aside className="cart-panel" onClick={event => event.stopPropagation()}>
         <div className="cart-header">
-          <div>
-            <p>Tu pedido</p>
-            <h2>Carrito</h2>
-          </div>
-          <button type="button" className="icon-button" onClick={close} aria-label="Cerrar carrito" title="Cerrar" autoFocus>
+          <h2>
+            Carrito
+            {units > 0 && <span className="cart-header-count">{units === 1 ? '1 producto' : `${units} productos`}</span>}
+          </h2>
+          <button type="button" className="cart-close" onClick={close} aria-label="Cerrar carrito" title="Cerrar" autoFocus>
             <CloseIcon className="icon" />
           </button>
         </div>
@@ -108,10 +117,18 @@ function CartPanel() {
         <div ref={itemsRef} className="cart-items">
           {lines.length === 0 ? (
             <div className="cart-empty">
-              <p>Tu carrito está vacío.</p>
-              <button type="button" onClick={close}>
-                Ver productos
-              </button>
+              <span className="cart-empty-icon" aria-hidden="true">
+                <CartIcon className="icon" />
+              </span>
+              <h3>Tu carrito está vacío</h3>
+              <p>Elige tus chocolates favoritos y aparecerán aquí.</p>
+              <a className="cart-empty-primary" href="#catalogo" onClick={close}>
+                Ver chocolates
+              </a>
+              <a className="cart-empty-secondary" href={ROUTE_HREF.regalo} onClick={close}>
+                <GiftIcon className="icon" />
+                Arma una caja de regalo
+              </a>
             </div>
           ) : (
             lines.map(line => <CartLineItem key={line.product.id} line={line} waiting={waiting.has(line.product.id)} />)
@@ -120,15 +137,15 @@ function CartPanel() {
 
         {lines.length > 0 && (
           <div className="cart-footer">
-            <div>
+            <div className="cart-total">
               <span>Total estimado</span>
               <strong>{formatPrice(total)}</strong>
             </div>
-            <button type="button" onClick={() => sendWhatsAppOrder(lines)}>
+            <button type="button" className="cart-order" onClick={() => sendWhatsAppOrder(lines)}>
               <WhatsAppIcon className="icon" />
               Pedir por WhatsApp
             </button>
-            <small>Se abrirá WhatsApp con el detalle y las cantidades de tu pedido.</small>
+            <small>Se abrirá WhatsApp con tu pedido. Allí coordinamos el pago y la entrega.</small>
           </div>
         )}
       </aside>

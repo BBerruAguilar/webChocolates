@@ -1,19 +1,18 @@
-import type { Brand, BrandFilter, Product, ProductCategory } from '@/types/product'
+import { families } from '@/data/families'
+import type { CatalogFilter, Product } from '@/types/product'
 
-const CATEGORY_ORDER: Record<ProductCategory, number> = {
-  tableta: 0,
-  grageas: 1,
-  cacao: 2,
-}
+/**
+ * Productos del catálogo agrupados por producto principal, en el mismo orden del carrusel.
+ * Con "todos", al final se agregan los que aún no pertenecen a ninguna familia.
+ */
+export function filterCatalog(products: Product[], filter: CatalogFilter) {
+  const byId = new Map(products.map(product => [product.id, product]))
+  const groups = filter === 'todos' ? families : families.filter(family => family.id === filter)
+  const grouped = groups.flatMap(family =>
+    family.presentationIds.map(id => byId.get(id)).filter((product): product is Product => Boolean(product)),
+  )
 
-export const BRAND_FILTERS: BrandFilter[] = ['Todos', 'Wayu Chocolates', 'Choco Mikhuna']
-
-export function filterCatalog(products: Product[], filter: BrandFilter) {
-  return products
-    .filter(product => filter === 'Todos' || product.brand === filter)
-    .sort((a, b) => CATEGORY_ORDER[a.category] - CATEGORY_ORDER[b.category])
-}
-
-export function countByBrand(products: Product[], brand: Brand) {
-  return products.filter(product => product.brand === brand).length
+  if (filter !== 'todos') return grouped
+  const included = new Set(grouped.map(product => product.id))
+  return [...grouped, ...products.filter(product => !included.has(product.id))]
 }

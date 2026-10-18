@@ -7,13 +7,15 @@ import { families } from '@/data/families'
 //   "pepa", "grano" o "semilla" → grano de cacao            (ej. pepa.png)
 //   "tronco" o "arbol"          → foto del fruto en el árbol (ej. mazorca_tronco.jpg):
 //                                  reemplaza a la mazorca suelta en la etapa de cosecha.
+//   "interior"                  → tableta abierta en su envoltorio (ej. interior de chocolate.png):
+//                                  es la foto de la etapa final; sin ella se usa el empaque.
 // Si falta alguna, se usa una ilustración plana provisional.
 const files = import.meta.glob<string>('../resources/viajeCacao/*.{png,PNG,jpg,JPG,jpeg,JPEG,webp,WEBP}', {
   eager: true,
   import: 'default',
 })
 
-type PhotoKind = 'fruto' | 'abierto' | 'grano' | 'escena'
+type PhotoKind = 'fruto' | 'abierto' | 'grano' | 'escena' | 'interior'
 
 const OPEN_PATTERN = /abiert|partid/i
 const SCENE_PATTERN = /tronco|arbol|árbol/i
@@ -22,6 +24,7 @@ const PATTERNS: Record<PhotoKind, RegExp> = {
   escena: SCENE_PATTERN,
   fruto: /fruto|mazorca/i,
   grano: /pepa|grano|semilla/i,
+  interior: /interior/i,
 }
 
 function findPhoto(kind: PhotoKind) {
@@ -62,6 +65,7 @@ export type JourneyStage = {
 const beanPhoto = findPhoto('grano')
 const harvestScene = findPhoto('escena')
 const finalProduct = families.find(family => family.id === 'leche-80') ?? families[0]
+const openBarPhoto = findPhoto('interior') ?? finalProduct.image
 
 export const JOURNEY_STAGES: JourneyStage[] = [
   {
@@ -113,6 +117,6 @@ export const JOURNEY_STAGES: JourneyStage[] = [
     title: 'Chocolate',
     tint: '#ecdcd2', // cacao con leche
     text: 'Molemos, refinamos y templamos el cacao hasta formar la barra que llega a tus manos.',
-    visual: { kind: 'producto', photo: finalProduct.image },
+    visual: { kind: 'producto', photo: openBarPhoto },
   },
 ]

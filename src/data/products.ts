@@ -8,8 +8,7 @@ import leche30Tapir from '@/resources/chocolateLeche30/30gr_tapir.webp'
 
 const TINGO_MARIA = 'Tingo María, Perú'
 
-// TODO: confirmar el precio de las tabletas de 30 gr (se usó el de la Delicia Natural de 30 gr).
-const PRICE_30GR = 6
+const PRICE_30GR = 6.5
 
 export const products: Product[] = [
   // ── WAYU ──────────────────────────────────────────────────────
@@ -19,7 +18,7 @@ export const products: Product[] = [
     category: 'grageas',
     name: 'Grageas con Arándano',
     subtitle: '60% cacao de Tingo María',
-    price: 16.5,
+    price: 16,
     origin: TINGO_MARIA,
     description: 'Arándanos frescos cubiertos en chocolate 60% cacao fino de aroma. Explosión de sabor agridulce.',
     tags: ['60% Cacao', 'Arándano', 'Antioxidante'],
@@ -201,7 +200,7 @@ export const products: Product[] = [
     category: 'tableta',
     name: 'Chocolate Delicia Natural',
     subtitle: 'Chocolate con leche en sabores variados',
-    price: 6,
+    price: 6.5,
     weight: '30 gr',
     origin: TINGO_MARIA,
     description: 'Chocolate artesanal individual en diferentes sabores, entre ellos café, crema de maní y maní.',
@@ -245,7 +244,7 @@ export const products: Product[] = [
     category: 'grageas',
     name: 'Grageas con Aguaymanto',
     subtitle: '60% cacao con fruta tropical',
-    price: 16.5,
+    price: 16,
     origin: TINGO_MARIA,
     description: 'Aguaymanto cubierto con chocolate 60% cacao. Una combinación vibrante, frutal y ligeramente ácida.',
     tags: ['60% Cacao', 'Aguaymanto', 'Natural'],
@@ -258,7 +257,7 @@ export const products: Product[] = [
     category: 'grageas',
     name: 'Grageas con Fresa',
     subtitle: '60% cacao con fruta deshidratada',
-    price: 16.5,
+    price: 16,
     origin: TINGO_MARIA,
     description: 'Fresa frutal cubierta con chocolate artesanal al 60%. Dulce, fresca y perfecta para compartir.',
     tags: ['60% Cacao', 'Fresa', 'Artesanal'],
@@ -271,7 +270,7 @@ export const products: Product[] = [
     category: 'grageas',
     name: 'Grageas con Mango',
     subtitle: '60% cacao con fruta tropical',
-    price: 16.5,
+    price: 16,
     origin: TINGO_MARIA,
     description: 'Mango tropical cubierto con chocolate 60% cacao fino de aroma. Suave, jugoso y naturalmente peruano.',
     tags: ['60% Cacao', 'Mango', 'Tropical'],
@@ -284,7 +283,7 @@ export const products: Product[] = [
     category: 'grageas',
     name: 'Grageas con Piña',
     subtitle: '60% cacao con fruta tropical',
-    price: 16.5,
+    price: 16,
     origin: TINGO_MARIA,
     description: 'Piña tropical bañada en chocolate 60% cacao. Un contraste luminoso entre dulzor, acidez y cacao.',
     tags: ['60% Cacao', 'Piña', 'Tropical'],
@@ -297,7 +296,7 @@ export const products: Product[] = [
     category: 'grageas',
     name: 'Grageas con Pasas',
     subtitle: '60% cacao con fruta deshidratada',
-    price: 16.5,
+    price: 16,
     origin: TINGO_MARIA,
     description: 'Pasas seleccionadas cubiertas con chocolate artesanal al 60%. Un clásico intenso y equilibrado.',
     tags: ['60% Cacao', 'Pasas', 'Clásico'],
@@ -310,7 +309,7 @@ export const products: Product[] = [
     category: 'cacao',
     name: 'Cascarilla de Cacao',
     subtitle: '100% cacao en bolsa de 250 gr',
-    price: 14,
+    price: 12,
     weight: '250 gr',
     origin: TINGO_MARIA,
     description: 'Cascarilla de cacao de aroma profundo, ideal para preparar una infusión cálida y naturalmente reconfortante.',

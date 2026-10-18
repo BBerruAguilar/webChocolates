@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, ty
 import { HeroItem } from '@/components/hero/HeroItem'
 import { HeroParticles } from '@/components/hero/HeroParticles'
 import { ringOffset, useCarousel } from '@/components/hero/useCarousel'
-import { usePointerParallax } from '@/components/hero/usePointerParallax'
 import { ChevronIcon } from '@/components/icons/Icons'
 import { useIsVisible } from '@/hooks/useIsVisible'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
@@ -11,6 +10,8 @@ import './HeroShowcase.css'
 
 const AUTOPLAY_MS = 5200
 const SWIPE_THRESHOLD = 45
+/** Partículas de polvo que flotan dentro del haz. */
+const MOTES = 12
 
 type HeroShowcaseProps = {
   families: ProductFamily[]
@@ -20,7 +21,6 @@ type HeroShowcaseProps = {
   autoplayPaused?: boolean
 }
 
-const pad = (value: number) => String(value).padStart(2, '0')
 const brandWord = (family: ProductFamily) => (family.brand === 'Wayu Chocolates' ? 'Wayu' : 'Mikhuna')
 
 function scrollToSpotlight() {
@@ -36,13 +36,14 @@ export function HeroShowcase({ families, onActiveChange, autoplayPaused = false 
 
   const paused = interacting || reducedMotion || !visible || autoplayPaused
   const { active, previous, goTo, step } = useCarousel(families.length, { interval: AUTOPLAY_MS, paused })
-  const parallax = usePointerParallax(heroRef, !reducedMotion)
 
   useEffect(() => onActiveChange(families[active]), [active, families, onActiveChange])
 
   const family = families[active]
   const previousFamily = families[previous]
   const movedBy = ringOffset(active, previous, families.length)
+  const spotAimClass = `hero-spot-aim${movedBy === 0 ? ' is-turning-on' : ''}`
+  const spotAimStyle = { '--aim-from': `${movedBy > 0 ? -12 : 12}deg` } as CSSProperties
 
   function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.key === 'ArrowLeft') step(-1)
@@ -84,7 +85,6 @@ export function HeroShowcase({ families, onActiveChange, autoplayPaused = false 
       onBlurCapture={event => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setInteracting(false)
       }}
-      {...parallax}
     >
       {/* Capa 1: el producto activo, enorme y desenfocado, tiñe todo el fondo. */}
       <div className="hero-backdrop" aria-hidden="true">
@@ -93,12 +93,30 @@ export function HeroShowcase({ families, onActiveChange, autoplayPaused = false 
       </div>
       <div className="hero-glow" aria-hidden="true" />
 
-      {/* Capa 2: marca gigante en contorno, se mueve poco con el puntero (lejana). */}
+      {/* Capa 2: marca gigante en contorno, como letras en el telón que solo revela el foco. */}
       <div className="hero-word" aria-hidden="true">
         <span key={brandWord(family)}>{brandWord(family)}</span>
       </div>
 
       <HeroParticles />
+
+      {/*
+        Foco de teatro, en dos capas: detrás del producto (cono, punto de luz y círculo en el piso)
+        y delante (un velo tenue con polvo en el aire). El punto de luz queda fijo arriba; el haz
+        gira desde él siguiendo el vaivén del producto y, al cambiar de producto, baja la intensidad
+        y se reorienta desde el lado por el que llega el nuevo.
+      */}
+      <div className="hero-spot is-back" aria-hidden="true">
+        <div className="hero-spot-swing">
+          <div key={family.id} className={spotAimClass} style={spotAimStyle}>
+            <span className="hero-beam">
+              <span className="hero-beam-cone" />
+            </span>
+            <span className="hero-pool" />
+          </div>
+        </div>
+        <span className="hero-lamp" />
+      </div>
 
       {/* Capa 3: anillo 3D de productos sin fondo. */}
       <div className="hero-stage" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onTouchCancel={() => setInteracting(false)}>
@@ -124,11 +142,25 @@ export function HeroShowcase({ families, onActiveChange, autoplayPaused = false 
         </div>
       </div>
 
+      <div className="hero-spot is-front" aria-hidden="true">
+        <div className="hero-spot-swing">
+          <div key={family.id} className={spotAimClass} style={spotAimStyle}>
+            <span className="hero-beam">
+              <span className="hero-beam-cone" />
+            </span>
+            <span className="hero-motes">
+              {Array.from({ length: MOTES }, (_, index) => (
+                <span key={index} className="hero-mote" style={{ '--mote': index } as CSSProperties} />
+              ))}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <div className="hero-scrim" aria-hidden="true" />
 
       {/* Capa 4: contenido. */}
       <header className="hero-intro">
-        <p className="hero-eyebrow">Cacao fino de aroma de Tingo María</p>
         <h1 className="hero-title">
           El sabor que nace <em>de la selva</em>
         </h1>
@@ -142,28 +174,19 @@ export function HeroShowcase({ families, onActiveChange, autoplayPaused = false 
           </div>
         </div>
 
+        {/* Centro inferior: anterior, indicador para bajar y siguiente. */}
         <div className="hero-controls">
-          <div className="hero-counter" aria-hidden="true">
-            <strong>{pad(active + 1)}</strong>
-            <span className="hero-progress">
-              <span key={`${active}-${paused}`} className={paused ? 'is-paused' : ''} style={{ animationDuration: `${AUTOPLAY_MS}ms` }} />
-            </span>
-            <span>{pad(families.length)}</span>
-          </div>
-          <div className="hero-arrows">
-            <button type="button" className="hero-arrow" onClick={() => step(-1)} aria-label="Producto anterior">
-              <ChevronIcon direction="left" />
-            </button>
-            <button type="button" className="hero-arrow" onClick={() => step(1)} aria-label="Producto siguiente">
-              <ChevronIcon direction="right" />
-            </button>
-          </div>
+          <button type="button" className="hero-arrow" onClick={() => step(-1)} aria-label="Producto anterior">
+            <ChevronIcon direction="left" />
+          </button>
+          <a className="hero-scroll" href="#destacado" aria-label="Ver el producto en detalle">
+            <span />
+          </a>
+          <button type="button" className="hero-arrow" onClick={() => step(1)} aria-label="Producto siguiente">
+            <ChevronIcon direction="right" />
+          </button>
         </div>
       </div>
-
-      <a className="hero-scroll" href="#destacado" aria-label="Ver el producto en detalle">
-        <span />
-      </a>
     </section>
   )
 }

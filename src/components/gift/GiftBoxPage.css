@@ -5,11 +5,7 @@
   --gift-muted: rgba(243, 234, 219, 0.62);
   --gift-line: rgba(243, 234, 219, 0.16);
   --gift-accent: #e3b35c;
-  --kraft: #c9a77c;
-  --kraft-light: #dbbf95;
-  --kraft-dark: #9a774f;
-  --kraft-shadow: #7d5d3b;
-  --ribbon: #b8442a;
+  --gift-error: #f2a58e;
 
   min-height: 100vh;
   padding: calc(var(--nav-h) + 2.5rem) 2.5rem 5rem;
@@ -50,7 +46,7 @@
 .gift-header h1 {
   font-family: var(--font-display);
   font-size: clamp(2rem, 5vw, 3.4rem);
-  font-weight: 300;
+  font-weight: var(--weight-display);
   line-height: 1.05;
 }
 
@@ -61,18 +57,211 @@
   line-height: 1.6;
 }
 
-.gift-layout {
+/* ===== Indicador de pasos ===== */
+.gift-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+  margin-top: 1.5rem;
+  list-style: none;
+}
+
+.gift-stepper button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--gift-muted);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.gift-stepper button:disabled {
+  cursor: default;
+}
+
+/* Punto de cada paso: vacío por hacer, lleno al completarlo, dorado en el actual. */
+.gift-stepper-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  transition: background 300ms ease, transform 300ms ease;
+}
+
+.gift-stepper .is-done .gift-stepper-dot {
+  background: currentColor;
+}
+
+.gift-stepper .is-current button,
+.gift-stepper .is-done button {
+  color: var(--gift-ink);
+}
+
+.gift-stepper .is-current .gift-stepper-dot {
+  border-color: var(--gift-accent);
+  background: var(--gift-accent);
+  transform: scale(1.4);
+}
+
+.gift-stepper .is-done button:hover {
+  text-decoration: underline;
+}
+
+/*
+ * ===== Escenario =====
+ * Dos columnas que intercambian lugar según el paso: en "elegir" la caja va a la izquierda;
+ * en "dedicatoria" y "pago" viaja a la derecha y el panel queda a la izquierda.
+ */
+.gift-stage {
   display: grid;
+  grid-template-areas: 'box panel';
   grid-template-columns: minmax(0, 27rem) minmax(0, 1fr);
   align-items: start;
   gap: clamp(2rem, 5vw, 5rem);
   max-width: 1200px;
   margin: 0 auto;
+  scroll-margin-top: calc(var(--nav-h) + 1rem);
 }
 
-.gift-builder {
+.gift-stage[data-step='dedicatoria'],
+.gift-stage[data-step='pago'] {
+  grid-template-areas: 'panel box';
+  grid-template-columns: minmax(0, 1fr) minmax(0, 27rem);
+}
+
+.gift-stage[data-step='enviado'] {
+  grid-template-areas: 'panel';
+  grid-template-columns: minmax(0, 36rem);
+  justify-content: center;
+}
+
+.gift-box-column {
   position: sticky;
   top: calc(var(--nav-h) + 1.5rem);
+  grid-area: box;
+}
+
+.gift-vehicle {
+  position: relative;
+  will-change: transform;
+}
+
+.gift-panel {
+  grid-area: panel;
+  min-width: 0;
+  animation: gift-panel-in 650ms cubic-bezier(0.22, 0.8, 0.2, 1) both;
+}
+
+/* En "elegir" el panel llega desde la derecha; en los demás pasos, desde la izquierda. */
+.gift-stage[data-step='elegir'] .gift-panel {
+  --panel-from: 2rem;
+}
+
+.gift-panel h2 {
+  margin-bottom: 0.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-weight: var(--weight-display-strong);
+}
+
+.gift-panel-text {
+  max-width: 34rem;
+  margin-bottom: 1.5rem;
+  color: var(--gift-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.gift-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.gift-primary,
+.gift-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.9rem 1.4rem;
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 200ms ease, border-color 200ms ease;
+}
+
+.gift-primary {
+  border: 1px solid var(--gift-accent);
+  background: var(--gift-accent);
+  color: #2e1b10;
+  font-weight: 500;
+}
+
+.gift-primary:hover {
+  background: #edc477;
+}
+
+.gift-secondary {
+  border: 1px solid var(--gift-line);
+  background: transparent;
+  color: var(--gift-ink);
+}
+
+.gift-secondary:hover {
+  border-color: var(--gift-ink);
+}
+
+.gift-primary .icon,
+.gift-secondary .icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.gift-box-column > .gift-primary,
+.gift-back-step {
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
+/* El pago se coordina por WhatsApp: solo una nota antes del botón. */
+.gift-pay-note {
+  margin: 1.5rem 0 1rem;
+}
+
+/* ===== Confirmación ===== */
+.gift-done {
+  padding: 3rem 0;
+  text-align: center;
+}
+
+.gift-done h2 {
+  color: var(--gift-accent);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 300;
+}
+
+.gift-done .gift-panel-text {
+  margin: 0.75rem auto 0;
+}
+
+.gift-done .gift-actions {
+  justify-content: center;
+}
+
+@keyframes gift-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--panel-from, -2rem));
+  }
 }
 
 .gift-sizes {
@@ -108,263 +297,6 @@
   color: var(--gift-bg);
 }
 
-/* ==========================================================================
-   Caja de cartón 3D
-   Todas las medidas en % del ancho/alto de la escena, así escala con la pantalla.
-   ========================================================================== */
-.box3d {
-  position: relative;
-  width: 100%;
-  margin-top: 2.5rem;
-  aspect-ratio: 1 / 0.95;
-  perspective: 1000px;
-  perspective-origin: 50% -30%;
-}
-
-.box3d.is-bump {
-  animation: box-bump 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.box3d.is-shake {
-  animation: box-shake 420ms ease;
-}
-
-.box3d-shadow {
-  position: absolute;
-  right: 6%;
-  bottom: 2%;
-  left: 6%;
-  height: 7%;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.35);
-  filter: blur(10px);
-}
-
-/* Interior: pared del fondo y piso, en dos tonos planos. */
-.box3d-back,
-.box3d-floor {
-  position: absolute;
-  right: 3%;
-  left: 3%;
-}
-
-.box3d-back {
-  top: 29%;
-  height: 12%;
-  border-radius: 4px 4px 0 0;
-  background: var(--kraft-dark);
-}
-
-.box3d-floor {
-  top: 41%;
-  height: 16%;
-  background: var(--kraft-shadow);
-}
-
-/* Tabletas paradas dentro de la caja: el frente tapa la parte de abajo. */
-.box3d-item {
-  position: absolute;
-  bottom: calc(100% - var(--bottom));
-  left: var(--x);
-  width: 22%;
-  aspect-ratio: 3 / 4;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  transform: translateX(-50%) scale(var(--scale)) rotate(var(--tilt));
-  transform-origin: bottom center;
-}
-
-.box3d-item.is-empty {
-  pointer-events: none;
-  visibility: hidden;
-}
-
-.box3d-item img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 3px solid #fffaf2;
-  border-radius: 3px;
-  box-shadow: 0 6px 12px rgba(46, 27, 16, 0.35);
-  object-fit: cover;
-  opacity: 0;
-}
-
-/* La tableta "cae" dentro de la caja cuando termina el tiro. */
-.box3d-item.is-landed img {
-  opacity: 1;
-  animation: box-item-drop 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.box3d-item.is-landed:hover img {
-  transform: translateY(-8%);
-  transition: transform 200ms ease;
-}
-
-.box3d-front {
-  position: absolute;
-  top: 56%;
-  right: 0;
-  left: 0;
-  height: 36%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding-top: 1.1rem;
-  gap: 0.2rem;
-  border-top: 5px solid var(--kraft-light);
-  border-radius: 0 0 6px 6px;
-  background: var(--kraft);
-  color: rgba(46, 27, 16, 0.7);
-}
-
-.box3d-brand {
-  font-family: var(--font-display);
-  font-size: clamp(1rem, 2.4vw, 1.35rem);
-}
-
-.box3d-brand-sub {
-  padding-top: 0.3rem;
-  border-top: 1px solid rgba(46, 27, 16, 0.3);
-  font-size: 0.6rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-/* Tapa con bisagra atrás: abierta queda inclinada hacia atrás; cerrada cubre la caja. */
-.box3d-lid {
-  position: absolute;
-  top: 27%;
-  right: -2%;
-  left: -2%;
-  z-index: 5;
-  height: 31%;
-  padding: 0;
-  border: 0;
-  border-bottom: 9px solid var(--kraft);
-  border-radius: 5px;
-  background: var(--kraft-light);
-  cursor: default;
-  transform: rotateX(-118deg);
-  transform-origin: top center;
-  transition: transform 700ms cubic-bezier(0.5, 1.4, 0.5, 1);
-}
-
-.box3d.is-closed .box3d-lid {
-  cursor: pointer;
-  transform: rotateX(0deg);
-}
-
-.box3d-lid-print {
-  color: rgba(46, 27, 16, 0.55);
-  font-family: var(--font-display);
-  font-size: clamp(0.9rem, 2vw, 1.15rem);
-  opacity: 0;
-  transition: opacity 200ms ease;
-}
-
-.box3d.is-closed .box3d-lid-print {
-  opacity: 1;
-  transition-delay: 350ms;
-}
-
-/* ===== Lazo: se ata después de cerrar la tapa ===== */
-.box3d-ribbon {
-  position: absolute;
-  inset: 0;
-  z-index: 6;
-  pointer-events: none;
-}
-
-.box3d-ribbon-v {
-  position: absolute;
-  top: 27%;
-  left: 74%;
-  width: 7%;
-  height: 65%;
-  background: var(--ribbon);
-  transform: scaleY(0);
-  transform-origin: top;
-}
-
-.box3d-ribbon-h {
-  position: absolute;
-  top: 78%;
-  right: 0;
-  left: 0;
-  height: 7%;
-  background: var(--ribbon);
-  transform: scaleX(0);
-  transform-origin: left;
-}
-
-.box3d-bow {
-  position: absolute;
-  top: 17%;
-  left: 77.5%;
-  width: 34%;
-  fill: var(--ribbon);
-  transform: translateX(-50%) scale(0);
-}
-
-.box3d-tag {
-  position: absolute;
-  top: 30%;
-  right: 28%;
-  padding: 0.35rem 0.6rem;
-  border-radius: 2px;
-  background: #fffaf2;
-  color: #2e1b10;
-  font-family: var(--font-display);
-  font-size: 0.8rem;
-  white-space: nowrap;
-  opacity: 0;
-  transform: rotate(-8deg) translateY(-6px);
-  transform-origin: top right;
-}
-
-.box3d.has-ribbon .box3d-ribbon-v {
-  transform: scaleY(1);
-  transition: transform 350ms ease-out 650ms;
-}
-
-.box3d.has-ribbon .box3d-ribbon-h {
-  transform: scaleX(1);
-  transition: transform 350ms ease-out 850ms;
-}
-
-.box3d.has-ribbon .box3d-bow {
-  transform: translateX(-50%) scale(1);
-  transition: transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1) 1100ms;
-}
-
-.box3d.has-ribbon .box3d-tag {
-  opacity: 1;
-  transform: rotate(-8deg);
-  transition: opacity 300ms ease 1400ms, transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1) 1400ms;
-}
-
-@keyframes box-item-drop {
-  from { transform: translateY(-45%); }
-  70% { transform: translateY(5%); }
-  to { transform: translateY(0); }
-}
-
-@keyframes box-bump {
-  0% { transform: scale(1, 1); }
-  40% { transform: scale(1.02, 0.97) translateY(1.5%); }
-  100% { transform: scale(1, 1); }
-}
-
-@keyframes box-shake {
-  25% { transform: rotate(-3deg); }
-  50% { transform: rotate(3deg); }
-  75% { transform: rotate(-1.5deg); }
-}
-
 /* ===== Estado y dedicatoria ===== */
 .gift-count {
   display: flex;
@@ -383,16 +315,17 @@
   color: var(--gift-accent);
   font-family: var(--font-display);
   font-size: 1.35rem;
-  font-weight: 400;
+  font-weight: var(--weight-display-strong);
   animation: gift-ready-in 500ms ease 1500ms both;
 }
 
 .gift-card {
-  margin-top: 1.25rem;
+  max-width: 24rem;
+  margin-top: 1.5rem;
   padding: 1rem 1.1rem;
   background: #fffaf2;
   color: #2e1b10;
-  transform: rotate(-1.5deg);
+  transform: rotate(-1deg);
 }
 
 .gift-card-to {
@@ -400,12 +333,13 @@
   font-size: 1.05rem;
 }
 
+/* El mensaje parece escrito a mano en la tarjeta. */
 .gift-card-message {
-  margin-top: 0.4rem;
-  color: rgba(46, 27, 16, 0.8);
-  font-family: var(--font-display);
-  font-style: italic;
-  line-height: 1.5;
+  margin-top: 0.3rem;
+  color: #3b2416;
+  font-family: var(--font-hand);
+  font-size: 1.55rem;
+  line-height: 1.15;
   overflow-wrap: anywhere;
 }
 
@@ -416,32 +350,122 @@
   text-align: right;
 }
 
-/* ===== Opciones ===== */
-.gift-options {
+/* ===== Panel: chocolates, formulario y resumen ===== */
+/* ===== Buscador de tabletas ===== */
+.gift-search {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
-.gift-options h2 {
+.gift-search-box {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 400;
+  gap: 0.65rem;
+  padding: 0.25rem 0.35rem 0.25rem 1rem;
+  border: 1px solid var(--gift-line);
+  border-radius: 999px;
+  background: rgba(243, 234, 219, 0.06);
+  cursor: text;
+  transition: border-color 200ms ease, background 200ms ease, box-shadow 200ms ease;
 }
 
-.gift-options h2 span {
+.gift-search-box:focus-within {
+  border-color: var(--gift-accent);
+  background: rgba(243, 234, 219, 0.1);
+  box-shadow: 0 0 0 4px rgba(227, 179, 92, 0.12);
+}
+
+.gift-search-box > .icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: 0 0 auto;
+  color: var(--gift-muted);
+}
+
+.gift-search-box:focus-within > .icon {
+  color: var(--gift-accent);
+}
+
+.gift-search-box input {
+  flex: 1;
+  min-width: 0;
+  height: 2.3rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--gift-ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.gift-page .gift-search-box input:focus-visible {
+  outline: none;
+}
+
+.gift-search-box input::placeholder {
+  color: rgba(243, 234, 219, 0.4);
+}
+
+.gift-search-box input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.gift-search-box button {
   display: grid;
   width: 1.9rem;
   height: 1.9rem;
+  flex: 0 0 auto;
   place-items: center;
-  border: 1px solid var(--gift-ink);
+  padding: 0;
+  border: 0;
   border-radius: 50%;
+  background: rgba(243, 234, 219, 0.12);
+  color: var(--gift-ink);
+  cursor: pointer;
+}
+
+.gift-search-box button .icon {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.gift-search-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.gift-search-chips button {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--gift-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--gift-muted);
   font-family: var(--font-body);
   font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 200ms ease, background 200ms ease, color 200ms ease;
+}
+
+.gift-search-chips button:hover {
+  border-color: var(--gift-ink);
+  color: var(--gift-ink);
+}
+
+.gift-search-chips button.is-active {
+  border-color: var(--gift-accent);
+  background: var(--gift-accent);
+  color: #2e1b10;
+}
+
+.gift-search-empty {
+  padding: 1.5rem 0;
+  color: var(--gift-muted);
+  font-size: 0.9rem;
 }
 
 .gift-products {
@@ -560,6 +584,36 @@
   align-self: flex-end;
 }
 
+/* ===== Validación de la dedicatoria ===== */
+.gift-fields .gift-field-error {
+  align-self: flex-start;
+  min-height: 1em;
+  color: var(--gift-error);
+  font-size: 0.75rem;
+}
+
+.gift-field-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.gift-fields .is-invalid {
+  color: var(--gift-error);
+}
+
+.gift-fields .is-invalid input,
+.gift-fields .is-invalid textarea {
+  border-color: var(--gift-error);
+  background: rgba(242, 165, 142, 0.08);
+}
+
+.gift-fields .is-invalid input:focus,
+.gift-fields .is-invalid textarea:focus {
+  border-color: var(--gift-error);
+  box-shadow: 0 0 0 3px rgba(242, 165, 142, 0.18);
+}
+
 .gift-summary {
   border-top: 1px solid var(--gift-line);
   list-style: none;
@@ -574,6 +628,12 @@
   font-size: 0.9rem;
 }
 
+.gift-summary-note {
+  color: var(--gift-muted);
+  font-size: 0.82rem;
+  text-align: right;
+}
+
 .gift-summary-total {
   font-size: 1rem;
 }
@@ -581,7 +641,7 @@
 .gift-summary-total strong {
   font-family: var(--font-display);
   font-size: 1.4rem;
-  font-weight: 400;
+  font-weight: var(--weight-display-strong);
 }
 
 .gift-order {
@@ -632,15 +692,32 @@
     padding: calc(var(--nav-h) + 1.5rem) max(1.25rem, env(safe-area-inset-right)) 4rem max(1.25rem, env(safe-area-inset-left));
   }
 
-  .gift-layout {
+  /* En móvil todo va en una columna: la caja arriba y el panel debajo. */
+  .gift-stage,
+  .gift-stage[data-step='dedicatoria'],
+  .gift-stage[data-step='pago'] {
+    grid-template-areas: 'box' 'panel';
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .gift-builder {
+  .gift-box-column {
     position: static;
     width: 100%;
-    max-width: 24rem;
+    max-width: 22rem;
     margin: 0 auto;
+  }
+
+  .gift-stepper {
+    gap: 0.5rem 1.25rem;
+  }
+
+  .gift-stepper button {
+    font-size: 0.75rem;
+  }
+
+  .gift-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
   }
 
   /* En móvil los chocolates van en una fila deslizable, justo debajo de la caja. */
@@ -663,16 +740,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .box3d,
-  .box3d-item img,
-  .gift-ready {
+  .gift-ready,
+  .gift-panel {
     animation: none !important;
-  }
-
-  .box3d-lid,
-  .box3d-ribbon *,
-  .box3d-ribbon-v,
-  .box3d-ribbon-h {
-    transition: none !important;
   }
 }
