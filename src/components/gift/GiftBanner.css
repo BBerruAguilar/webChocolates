@@ -1,0 +1,187 @@
+/* Invitación a la caja de regalo: el mismo verde bosque de la página de regalo, sin degradados. */
+.gift-banner {
+  --banner-bg: #24391f;
+  --banner-deep: #1b2c17;
+  --banner-ink: #f3eadb;
+  --banner-gold: #e3b35c;
+
+  /* Se mete bajo el borde curvo de la sección de arriba para que no asome otro fondo. */
+  --tuck: 4rem;
+
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  margin-top: calc(-1 * var(--tuck));
+  padding: calc(clamp(4rem, 9vw, 7rem) + var(--tuck)) 2.5rem clamp(4rem, 9vw, 7rem);
+  background: var(--banner-bg);
+  color: var(--banner-ink);
+}
+
+/* Hojas y mazorca grandes, tono sobre tono, como estampado del fondo. */
+.gift-banner-leaf {
+  position: absolute;
+  z-index: -1;
+  height: auto;
+  color: #2c4526;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Hoja detrás de la caja, en la esquina; la mazorca abajo a la izquierda, lejos del texto. */
+.gift-banner-leaf.is-large {
+  top: 8%;
+  right: -3rem;
+  width: clamp(12rem, 20vw, 18rem);
+  transform: rotate(32deg);
+}
+
+.gift-banner-leaf.is-pod {
+  bottom: -14%;
+  left: 3%;
+  width: clamp(6rem, 9vw, 8rem);
+  transform: rotate(-24deg);
+}
+
+.gift-banner-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+  align-items: center;
+  gap: clamp(2.5rem, 7vw, 7rem);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.gift-banner-copy h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5.2vw, 4.2rem);
+  font-weight: var(--weight-display);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.gift-banner-copy h2 em {
+  display: block;
+  color: var(--banner-gold);
+  font-family: var(--font-accent);
+  font-size: 1.1em;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.gift-banner-copy p {
+  max-width: 30rem;
+  margin-top: 1.4rem;
+  color: rgba(243, 234, 219, 0.74);
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.gift-banner-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 2rem;
+  padding: 1rem 1.6rem;
+  border-radius: 4px;
+  background: var(--banner-gold);
+  color: #2e1b10;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 200ms ease, transform 200ms ease;
+}
+
+.gift-banner-link:hover {
+  background: #edc477;
+  transform: translateY(-2px);
+}
+
+.gift-banner-link:focus-visible {
+  outline: 2px solid var(--banner-ink);
+  outline-offset: 3px;
+}
+
+.gift-banner-link .icon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+/* ===== Caja ===== */
+.gift-banner-box {
+  position: relative;
+  cursor: pointer;
+  /* Flota apenas, como si estuviera sobre una mesa iluminada. */
+  animation: gift-banner-float 6s ease-in-out infinite alternate;
+}
+
+/* Base plana bajo la caja, un tono más oscuro que el fondo. */
+.gift-banner-box::before {
+  position: absolute;
+  right: -6%;
+  bottom: -4%;
+  left: -6%;
+  height: 22%;
+  border-radius: 50%;
+  background: var(--banner-deep);
+  content: '';
+}
+
+.gift-banner-box .box3d {
+  margin-top: 0;
+}
+
+/* El texto del lazo usa la palabra completa "Para ti" en letra manuscrita. */
+.gift-banner-box .box3d-tag {
+  font-size: 1.3rem;
+}
+
+@keyframes gift-banner-float {
+  from { transform: translateY(-4px); }
+  to { transform: translateY(4px); }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 860px) {
+  .gift-banner {
+    --tuck: 2rem;
+
+    padding: calc(4rem + var(--tuck)) max(1.25rem, env(safe-area-inset-right)) 4.5rem max(1.25rem, env(safe-area-inset-left));
+  }
+
+  .gift-banner-inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3rem;
+  }
+
+  .gift-banner-box {
+    width: 100%;
+    max-width: 22rem;
+    margin: 0 auto;
+  }
+
+  .gift-banner-leaf.is-large {
+    top: auto;
+    bottom: 4%;
+  }
+}
+
+@media (max-width: 600px) {
+  .gift-banner-link {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (hover: none) {
+  .gift-banner-link:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gift-banner-box {
+    animation: none;
+  }
+}

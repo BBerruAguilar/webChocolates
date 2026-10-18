@@ -1,0 +1,38 @@
+.flight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  /* Por debajo del menú (50) y por encima del contenido. */
+  z-index: 45;
+  visibility: hidden;
+  pointer-events: none;
+  perspective: 1100px;
+  will-change: transform, width, height;
+}
+
+.flight-body {
+  position: absolute;
+  inset: 0;
+  /* Giro en el aire: va y vuelve sobre su eje vertical durante el salto. */
+  transform: rotateY(var(--flight-tilt, 0deg));
+}
+
+.flight-body img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  /* La sombra se aleja y difumina mientras más alto va el salto. */
+  filter:
+    drop-shadow(0 calc(30px + var(--flight-arc, 0) * 60px) calc(26px + var(--flight-arc, 0) * 30px) rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 calc(var(--flight-arc, 0) * 30px) rgba(245, 211, 138, 0.35));
+}
+
+/* Origen y destino se ocultan mientras el clon hace el recorrido. */
+.app-shell[data-flight='flying'] [data-flight-source],
+.app-shell[data-flight='landed'] [data-flight-source],
+.app-shell[data-flight='idle'] [data-flight-target],
+.app-shell[data-flight='flying'] [data-flight-target] {
+  opacity: 0;
+}

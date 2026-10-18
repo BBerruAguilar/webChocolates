@@ -1,0 +1,164 @@
+.unwrap {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  padding: clamp(1rem, 4vw, 3rem);
+  place-items: center;
+  background: #f3eadb;
+  color: #2e1b10;
+  animation: unwrap-in 250ms ease-out;
+}
+
+.unwrap-content {
+  position: relative;
+  display: flex;
+  width: min(100%, 34rem);
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.unwrap-close {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(46, 27, 16, 0.2);
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.unwrap-close .icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.unwrap-stage {
+  position: relative;
+  width: min(80vw, 46vh);
+  width: min(80vw, 46svh);
+  aspect-ratio: 4 / 5;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  perspective: 1200px;
+}
+
+/* Lo que hay dentro: espera detrás del empaque, un poco más pequeño. */
+.unwrap-inside {
+  position: absolute;
+  inset: 12% 14%;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity 400ms ease 150ms,
+    transform 600ms cubic-bezier(0.34, 1.56, 0.64, 1) 150ms;
+}
+
+.unwrap-inside img,
+.unwrap-illustration {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.unwrap-wrapper {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.unwrap-half {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  backface-visibility: hidden;
+  /* Las solapas giran primero y se desvanecen al final, para que se vea cómo se abren. */
+  transition:
+    transform 900ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    opacity 350ms ease 550ms;
+  user-select: none;
+}
+
+.unwrap-half.is-left {
+  clip-path: inset(0 50% 0 0);
+  transform-origin: left center;
+}
+
+.unwrap-half.is-right {
+  clip-path: inset(0 0 0 50%);
+  transform-origin: right center;
+}
+
+.unwrap-stage.is-open .unwrap-half.is-left {
+  opacity: 0;
+  transform: translateX(-18%) rotateY(-80deg);
+}
+
+.unwrap-stage.is-open .unwrap-half.is-right {
+  opacity: 0;
+  transform: translateX(18%) rotateY(80deg);
+}
+
+.unwrap-stage.is-open .unwrap-inside {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Pequeño movimiento que invita a tocar mientras está cerrado. */
+.unwrap-stage:not(.is-open) .unwrap-wrapper {
+  animation: unwrap-nudge 2.4s ease-in-out infinite;
+}
+
+.unwrap-caption {
+  text-align: center;
+}
+
+.unwrap-caption h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: var(--weight-display);
+}
+
+.unwrap-caption p {
+  max-width: 26rem;
+  margin-top: 0.5rem;
+  color: rgba(46, 27, 16, 0.65);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+@keyframes unwrap-in {
+  from { opacity: 0; }
+}
+
+@keyframes unwrap-nudge {
+  0%, 70%, 100% { transform: rotate(0); }
+  78% { transform: rotate(-2deg); }
+  86% { transform: rotate(2deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unwrap,
+  .unwrap-stage .unwrap-wrapper {
+    animation: none;
+  }
+
+  .unwrap-half,
+  .unwrap-inside {
+    transition-duration: 1ms;
+  }
+}

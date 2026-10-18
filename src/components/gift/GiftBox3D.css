@@ -1,0 +1,359 @@
+/* ==========================================================================
+   Caja de regalo: chocolate oscuro con detalles dorados.
+   Colores planos (sin degradados); el volumen se logra con dos tonos por cara.
+   Todas las medidas en % del ancho/alto de la escena, así escala con la pantalla.
+   ========================================================================== */
+.box3d {
+  --box-front: #3e2416;
+  --box-front-side: #301b10;
+  --box-edge: #57361f;
+  --box-lid: #4b2c1b;
+  --box-lid-edge: #331d11;
+  --box-inside: #24150c;
+  --box-inside-back: #2d1a0f;
+  --gold: #d9b26a;
+  --gold-dark: #b08a45;
+  --tissue: #efe3cc;
+  --tissue-shadow: #d9c9a8;
+
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 0.95;
+  margin-top: 2.5rem;
+  perspective: 1000px;
+  perspective-origin: 50% -30%;
+}
+
+.box3d.is-bump {
+  animation: box-bump 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.box3d.is-shake {
+  animation: box-shake 420ms ease;
+}
+
+.box3d-shadow {
+  position: absolute;
+  right: 6%;
+  bottom: 2%;
+  left: 6%;
+  height: 7%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  filter: blur(10px);
+}
+
+/* Interior: pared del fondo y piso. */
+.box3d-back,
+.box3d-floor {
+  position: absolute;
+  right: 3%;
+  left: 3%;
+}
+
+.box3d-back {
+  top: 29%;
+  height: 12%;
+  border-radius: 4px 4px 0 0;
+  background: var(--box-inside-back);
+}
+
+.box3d-floor {
+  top: 41%;
+  height: 16%;
+  background: var(--box-inside);
+}
+
+/* Tabletas paradas dentro de la caja: el frente tapa la parte de abajo. */
+.box3d-item {
+  position: absolute;
+  bottom: calc(100% - var(--bottom));
+  left: var(--x);
+  width: 22%;
+  aspect-ratio: 3 / 4;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform: translateX(-50%) scale(var(--scale)) rotate(var(--tilt));
+  transform-origin: bottom center;
+}
+
+.box3d-item.is-empty {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.box3d-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 3px solid #fffaf2;
+  border-radius: 3px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  object-fit: cover;
+  opacity: 0;
+}
+
+/* La tableta "cae" dentro de la caja cuando termina el tiro. */
+.box3d-item.is-landed img {
+  opacity: 1;
+  animation: box-item-drop 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.box3d-item.is-landed:hover img {
+  transform: translateY(-8%);
+  transition: transform 200ms ease;
+}
+
+/* Papel de seda con borde en zigzag, entre las tabletas y el frente. */
+.box3d-tissue {
+  position: absolute;
+  top: 50%;
+  right: 1.5%;
+  left: 1.5%;
+  height: 7.5%;
+  background: var(--tissue);
+  clip-path: polygon(
+    0 45%, 4% 0, 9% 50%, 14% 10%, 19% 55%, 25% 5%, 31% 50%, 37% 15%, 43% 55%, 49% 0,
+    55% 50%, 61% 10%, 67% 55%, 73% 5%, 79% 50%, 85% 15%, 91% 55%, 96% 5%, 100% 45%, 100% 100%, 0 100%
+  );
+}
+
+.box3d-tissue::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 35%;
+  background: var(--tissue-shadow);
+  content: '';
+}
+
+/* ===== Frente ===== */
+.box3d-front {
+  position: absolute;
+  top: 56%;
+  right: 0;
+  left: 0;
+  height: 36%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.25rem;
+  padding-top: 3%;
+  overflow: hidden;
+  border-top: 5px solid var(--box-edge);
+  border-radius: 0 0 6px 6px;
+  background: var(--box-front);
+  color: var(--gold);
+}
+
+/* Marco dorado fino. */
+.box3d-front::before {
+  position: absolute;
+  inset: 10% 4%;
+  border: 1px solid rgba(217, 178, 106, 0.55);
+  border-radius: 3px;
+  content: '';
+}
+
+/* Cara lateral en sombra: da volumen sin degradados. */
+.box3d-front::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 3.5%;
+  background: var(--box-front-side);
+  content: '';
+}
+
+.box3d-seal {
+  width: clamp(1.6rem, 4vw, 2.2rem);
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.box3d-brand {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  letter-spacing: 0.02em;
+}
+
+.box3d-brand-sub {
+  color: rgba(217, 178, 106, 0.75);
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ===== Tapa con bisagra atrás: abierta queda inclinada hacia atrás; cerrada cubre la caja ===== */
+.box3d-lid {
+  position: absolute;
+  top: 27%;
+  right: -2%;
+  left: -2%;
+  z-index: 5;
+  display: grid;
+  height: 31%;
+  padding: 0 0 0 9%;
+  place-items: center start;
+  overflow: hidden;
+  border: 0;
+  border-bottom: 9px solid var(--box-lid-edge);
+  border-radius: 5px;
+  /* Estampado tono sobre tono de hojas de cacao. */
+  background-color: var(--box-lid);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='%23573420'%3E%3Cpath d='M14 6c7 5 7 15 0 20-7-5-7-15 0-20Z'/%3E%3Cpath d='M42 30c7 5 7 15 0 20-7-5-7-15 0-20Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 56px 56px;
+  cursor: default;
+  transform: rotateX(-118deg);
+  transform-origin: top center;
+  transition: transform 700ms cubic-bezier(0.5, 1.4, 0.5, 1);
+}
+
+.box3d.is-closed .box3d-lid {
+  cursor: pointer;
+  transform: rotateX(0deg);
+}
+
+/* Etiqueta central de la tapa. */
+.box3d-lid-print {
+  padding: 0.45rem 1.1rem;
+  border: 1px solid var(--gold);
+  border-radius: 2px;
+  background: var(--box-lid);
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.box3d.is-closed .box3d-lid-print {
+  opacity: 1;
+  transition-delay: 350ms;
+}
+
+/* ===== Cinta dorada: se ata después de cerrar la tapa ===== */
+.box3d-ribbon {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.box3d-ribbon-v {
+  position: absolute;
+  top: 27%;
+  left: 74%;
+  width: 6%;
+  height: 65%;
+  background: var(--gold);
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
+/* La cinta horizontal pasa por debajo del nombre, cerca de la base. */
+.box3d-ribbon-h {
+  position: absolute;
+  top: 85%;
+  right: 0;
+  left: 0;
+  height: 6%;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.box3d-bow {
+  position: absolute;
+  top: 17%;
+  left: 77%;
+  width: 30%;
+  transform: translateX(-50%) scale(0);
+}
+
+.box3d-bow path {
+  fill: var(--gold);
+}
+
+.box3d-bow path:last-of-type,
+.box3d-bow circle {
+  fill: var(--gold-dark);
+}
+
+.box3d-tag {
+  position: absolute;
+  top: 30%;
+  right: 28%;
+  padding: 0.35rem 0.6rem;
+  border-radius: 2px;
+  background: #fffaf2;
+  color: #2e1b10;
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  transform: rotate(-8deg) translateY(-6px);
+  transform-origin: top right;
+}
+
+.box3d.has-ribbon .box3d-ribbon-v {
+  transform: scaleY(1);
+  transition: transform 350ms ease-out 650ms;
+}
+
+.box3d.has-ribbon .box3d-ribbon-h {
+  transform: scaleX(1);
+  transition: transform 350ms ease-out 850ms;
+}
+
+.box3d.has-ribbon .box3d-bow {
+  transform: translateX(-50%) scale(1);
+  transition: transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1) 1100ms;
+}
+
+.box3d.has-ribbon .box3d-tag {
+  opacity: 1;
+  transform: rotate(-8deg);
+  transition: opacity 300ms ease 1400ms, transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1) 1400ms;
+}
+
+@keyframes box-item-drop {
+  from { transform: translateY(-45%); }
+  70% { transform: translateY(5%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes box-bump {
+  0% { transform: scale(1, 1); }
+  40% { transform: scale(1.02, 0.97) translateY(1.5%); }
+  100% { transform: scale(1, 1); }
+}
+
+@keyframes box-shake {
+  25% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+  75% { transform: rotate(-1.5deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .box3d,
+  .box3d-item img {
+    animation: none !important;
+  }
+
+  .box3d-lid,
+  .box3d-ribbon-v,
+  .box3d-ribbon-h,
+  .box3d-bow,
+  .box3d-tag {
+    transition: none !important;
+  }
+}
