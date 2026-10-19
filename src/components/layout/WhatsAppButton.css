@@ -1,0 +1,140 @@
+/*
+ * Botón flotante de WhatsApp: en reposo un círculo verde con aro cálido; al pasar el mouse
+ * se abre en una píldora oscura y el texto sale hacia la izquierda, como los íconos del menú.
+ */
+.whatsapp-float {
+  --wa-green: #25d366;
+  --wa-green-dark: #1da851;
+  --wa-pill: #1f120a;
+  --wa-ink: #f5ede0;
+
+  position: fixed;
+  right: max(1.5rem, env(safe-area-inset-right));
+  bottom: max(1.5rem, env(safe-area-inset-bottom));
+  z-index: 80;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem;
+  border: 1px solid rgba(245, 237, 224, 0.22);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--wa-ink);
+  text-decoration: none;
+  transition: background 300ms ease, box-shadow 300ms ease, border-color 300ms ease;
+}
+
+.whatsapp-badge {
+  position: relative;
+  display: grid;
+  width: 3.1rem;
+  height: 3.1rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--wa-green);
+  box-shadow: 0 10px 26px -6px rgba(29, 168, 81, 0.6), 0 4px 10px rgba(0, 0, 0, 0.25);
+  color: #fff;
+  transition: background 200ms ease, transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.whatsapp-badge svg {
+  width: 1.6rem;
+  height: 1.6rem;
+  fill: currentColor;
+}
+
+/* Pulso suave cada pocos segundos: invita a escribir sin distraer. */
+.whatsapp-badge::after {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55);
+  content: '';
+  animation: whatsapp-pulse 3.2s ease-out infinite;
+}
+
+.whatsapp-label {
+  display: flex;
+  max-width: 0;
+  overflow: hidden;
+  flex-direction: column;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(0.75rem);
+  transition:
+    max-width 380ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    margin 380ms cubic-bezier(0.22, 0.8, 0.2, 1),
+    opacity 220ms ease,
+    transform 380ms cubic-bezier(0.22, 0.8, 0.2, 1);
+}
+
+.whatsapp-label strong {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.whatsapp-label small {
+  color: rgba(245, 237, 224, 0.65);
+  font-size: 0.7rem;
+}
+
+.whatsapp-float:hover,
+.whatsapp-float:focus-visible {
+  border-color: rgba(245, 237, 224, 0.3);
+  background: var(--wa-pill);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+.whatsapp-float:hover .whatsapp-label,
+.whatsapp-float:focus-visible .whatsapp-label {
+  max-width: 12rem;
+  margin: 0 0.8rem 0 1rem;
+  opacity: 1;
+  transform: none;
+}
+
+.whatsapp-float:hover .whatsapp-badge {
+  background: var(--wa-green-dark);
+  transform: rotate(-8deg);
+}
+
+.whatsapp-float:focus-visible {
+  outline: 2px solid var(--wa-green);
+  outline-offset: 3px;
+}
+
+@keyframes whatsapp-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55); }
+  45%, 100% { box-shadow: 0 0 0 0.9rem rgba(37, 211, 102, 0); }
+}
+
+@media (max-width: 600px) {
+  .whatsapp-float {
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .whatsapp-badge {
+    width: 2.9rem;
+    height: 2.9rem;
+  }
+}
+
+@media (hover: none) {
+  .whatsapp-label {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .whatsapp-badge::after {
+    animation: none;
+  }
+
+  .whatsapp-label,
+  .whatsapp-badge {
+    transition: none;
+  }
+}

@@ -1,0 +1,77 @@
+.site-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(160deg, #dcc8aa 0%, #cdb38f 55%, #c2a47c 100%);
+}
+
+.site-bg-layer {
+  position: absolute;
+  inset: 0;
+  will-change: opacity;
+}
+
+.site-bg-b {
+  background: linear-gradient(200deg, #c9b68c 0%, #b9ad84 50%, #d2bc9a 100%);
+  animation: fondo-cambia 34s ease-in-out infinite;
+}
+
+.site-bg-c {
+  background: linear-gradient(120deg, #d8bf9c 0%, #c4a07a 55%, #b99a78 100%);
+  animation: fondo-cambia 34s ease-in-out infinite;
+  animation-delay: -17s;
+}
+
+.site-bg-glow {
+  position: absolute;
+  inset: -30%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 243, 220, 0.5), transparent 42%);
+  animation: fondo-luz 42s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.site-bg-shape {
+  position: absolute;
+  height: auto;
+  animation: fondo-flota 50s ease-in-out infinite;
+  will-change: transform;
+}
+
+.site-bg-shape.leaf { color: #4f6b3a; opacity: 0.16; }
+.site-bg-shape.pod { color: #6b3e22; opacity: 0.13; }
+.site-bg-shape.bean { color: #4a2a17; opacity: 0.15; }
+
+@keyframes fondo-cambia {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+@keyframes fondo-luz {
+  from { transform: translate3d(-8%, -6%, 0); }
+  to { transform: translate3d(14%, 10%, 0); }
+}
+
+@keyframes fondo-flota {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--r0, 0deg)); }
+  50% { transform: translate3d(var(--dx, 30px), var(--dy, -40px), 0) rotate(var(--r1, 20deg)); }
+}
+
+@media (max-width: 700px) {
+  .site-bg-shape.hide-mobile {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-bg-layer,
+  .site-bg-glow,
+  .site-bg-shape {
+    animation: none !important;
+  }
+
+  .site-bg-layer {
+    opacity: 0;
+  }
+}

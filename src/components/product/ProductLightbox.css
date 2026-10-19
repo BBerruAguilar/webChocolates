@@ -1,0 +1,71 @@
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 3rem);
+  background-color: rgba(40, 26, 17, 0.9);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  cursor: zoom-out;
+  animation: lightbox-in 240ms ease-out;
+}
+
+.lightbox-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-width: min(92vw, 1100px);
+  max-height: 92vh;
+  cursor: default;
+}
+
+.lightbox-close {
+  display: grid;
+  width: 2.6rem;
+  height: 2.6rem;
+  align-self: flex-end;
+  margin-bottom: 0.75rem;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(10, 6, 2, 0.7);
+  color: #f5ede0;
+  cursor: pointer;
+}
+
+.lightbox-close .icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.lightbox-content img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(92vh - 5rem);
+  border-radius: 3px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7);
+  object-fit: contain;
+}
+
+.lightbox-content p {
+  margin-top: 0.8rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: var(--weight-display);
+  text-align: center;
+}
+
+@keyframes lightbox-in {
+  from { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lightbox {
+    animation: none;
+  }
+}

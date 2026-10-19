@@ -1,0 +1,374 @@
+/* "Del grano a la barra": estilo plano, colores sólidos y líneas finas. */
+.journey {
+  --journey-bg: #e8f3db;
+  --journey-ink: #2e1b10;
+  --journey-muted: rgba(46, 27, 16, 0.5);
+  --journey-line: rgba(46, 27, 16, 0.14);
+  --journey-accent: #a94a25;
+
+  position: relative;
+  /* Cada etapa ocupa un tramo de scroll; la vista queda fija (sticky) mientras tanto. */
+  height: calc(var(--journey-steps) * 70vh + 100vh);
+  height: calc(var(--journey-steps) * 70svh + 100svh);
+  border-top: 1px solid var(--journey-line);
+  background: var(--journey-bg);
+  color: var(--journey-ink);
+  /* Cada etapa tiñe el fondo con un tono suave; el cambio es lento para que no distraiga. */
+  transition: background-color 900ms ease;
+  scroll-margin-top: 0;
+  /* La foto ambiental es más ancha que la pantalla: se recorta sin crear scroll lateral. */
+  overflow-x: clip;
+}
+
+.journey-sticky {
+  position: sticky;
+  top: 0;
+  display: grid;
+  height: 100vh;
+  height: 100svh;
+  grid-template-areas:
+    'header header header'
+    'steps visual copy';
+  grid-template-columns: 13rem minmax(0, 1fr) 22rem;
+  grid-template-rows: auto 1fr;
+  gap: 1.5rem clamp(2rem, 4vw, 4rem);
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: calc(var(--nav-h) + 1.5rem) 2.5rem 3rem;
+}
+
+/* El texto siempre por encima de la foto ambiental. */
+.journey-header,
+.journey-steps,
+.journey-copy,
+.journey-progress {
+  z-index: 1;
+}
+
+.journey-header {
+  position: relative;
+  grid-area: header;
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--journey-line);
+}
+
+
+.journey-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: var(--weight-display);
+}
+
+/* ===== Lista de etapas ===== */
+.journey-steps {
+  position: relative;
+  grid-area: steps;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+  list-style: none;
+}
+
+.journey-steps button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.55rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--journey-line);
+  background: none;
+  color: var(--journey-muted);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: color 250ms ease;
+}
+
+/* Punto que marca la etapa: se llena al pasar por ella. */
+.journey-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  flex: 0 0 auto;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  transition: background 250ms ease, transform 250ms ease;
+}
+
+.journey-steps button.is-done .journey-dot {
+  background: currentColor;
+}
+
+.journey-steps button.is-done {
+  color: rgba(46, 27, 16, 0.75);
+}
+
+.journey-steps button.is-active {
+  border-bottom-color: var(--journey-ink);
+  color: var(--journey-ink);
+  font-weight: 500;
+}
+
+.journey-steps button.is-active .journey-dot {
+  border-color: var(--journey-accent);
+  background: var(--journey-accent);
+  transform: scale(1.4);
+}
+
+.journey-steps button:hover {
+  color: var(--journey-ink);
+}
+
+/* ===== Imagen de la etapa ===== */
+.journey-visual {
+  --ring-size: min(56vh, 40vw);
+  --ring-size: min(56svh, 40vw);
+
+  position: relative;
+  grid-area: visual;
+  display: grid;
+  min-height: 0;
+  place-items: center;
+}
+
+.journey-ring {
+  position: absolute;
+  z-index: 1;
+  width: var(--ring-size);
+  aspect-ratio: 1;
+  border: 1px solid var(--journey-line);
+  border-radius: 50%;
+}
+
+/*
+ * Foto ambiental (ej. la mazorca en el árbol). Se escala respecto del círculo y se mueve
+ * para que el punto --focus quede en su centro. La máscara la deja nítida dentro del
+ * círculo y la desvanece suavemente hacia afuera, hasta fundirse con el fondo.
+ */
+.journey-scene {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--ring-size) * 4);
+  max-width: none;
+  height: auto;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(calc(-1 * var(--focus-x)), calc(-1 * var(--focus-y))) scale(1.06);
+  transform-origin: var(--focus-x) var(--focus-y);
+  transition:
+    opacity 700ms ease,
+    transform 1200ms cubic-bezier(0.22, 0.8, 0.2, 1);
+  -webkit-mask-image: radial-gradient(
+    ellipse calc(var(--ring-size) * 1.3) calc(var(--ring-size) * 1.05) at var(--focus-x) var(--focus-y),
+    #000 0%,
+    #000 34%,
+    rgba(0, 0, 0, 0.28) 48%,
+    rgba(0, 0, 0, 0.1) 72%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse calc(var(--ring-size) * 1.3) calc(var(--ring-size) * 1.05) at var(--focus-x) var(--focus-y),
+    #000 0%,
+    #000 34%,
+    rgba(0, 0, 0, 0.28) 48%,
+    rgba(0, 0, 0, 0.1) 72%,
+    transparent 100%
+  );
+}
+
+/* Al entrar se acerca muy despacio, como si la cámara se acomodara. */
+.journey-scene.is-active {
+  opacity: 1;
+  transform: translate(calc(-1 * var(--focus-x)), calc(-1 * var(--focus-y))) scale(1);
+}
+
+.journey-figure {
+  position: absolute;
+  width: min(80%, 44vh);
+  width: min(80%, 44svh);
+  aspect-ratio: 3 / 4;
+  transition:
+    opacity 600ms ease,
+    transform 700ms cubic-bezier(0.22, 0.8, 0.2, 1);
+}
+
+.journey-figure.is-past {
+  opacity: 0;
+  transform: translateY(-12%) scale(0.85) rotate(-8deg);
+}
+
+.journey-figure.is-active {
+  opacity: 1;
+  transform: none;
+}
+
+.journey-figure.is-next {
+  opacity: 0;
+  transform: translateY(12%) scale(0.85) rotate(8deg);
+}
+
+.journey-photo,
+.journey-illustration {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Un montón de granos armado con la misma foto; el tono cambia según la etapa. */
+.journey-pile {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.journey-pile img {
+  position: absolute;
+  width: 20%;
+  transform: rotate(var(--rotate, 0deg));
+  filter: drop-shadow(0 6px 6px rgba(46, 27, 16, 0.25));
+}
+
+/* La foto es de un grano seco: fermentado se ve más claro y rojizo, tostado más oscuro. */
+.journey-pile.tone-fermentado img {
+  filter: sepia(0.2) saturate(1.4) hue-rotate(-15deg) brightness(1.2) drop-shadow(0 6px 6px rgba(46, 27, 16, 0.25));
+}
+
+.journey-pile.tone-tostado img {
+  filter: brightness(0.6) contrast(1.15) drop-shadow(0 6px 6px rgba(46, 27, 16, 0.25));
+}
+
+/* ===== Texto ===== */
+.journey-copy {
+  position: relative;
+  grid-area: copy;
+  display: flex;
+  align-items: center;
+}
+
+.journey-copy-inner {
+  animation: journey-copy-in 500ms cubic-bezier(0.22, 0.8, 0.2, 1) both;
+}
+
+.journey-copy h3 {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-weight: var(--weight-display);
+  line-height: 1;
+}
+
+.journey-copy p {
+  color: rgba(46, 27, 16, 0.78);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* Barra de avance de todo el recorrido. */
+.journey-progress {
+  position: absolute;
+  right: 2.5rem;
+  bottom: 1.5rem;
+  left: 2.5rem;
+  height: 1px;
+  background: var(--journey-line);
+}
+
+.journey-progress span {
+  position: absolute;
+  inset: 0;
+  background: var(--journey-ink);
+  transform: scaleX(var(--journey-progress, 0));
+  transform-origin: left;
+}
+
+@keyframes journey-copy-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .journey-sticky {
+    grid-template-areas:
+      'header'
+      'visual'
+      'copy'
+      'steps';
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    gap: 1rem;
+    padding: calc(var(--nav-h) + 0.75rem) max(1.25rem, env(safe-area-inset-right)) 2rem max(1.25rem, env(safe-area-inset-left));
+  }
+
+  .journey-header {
+    padding-bottom: 0.75rem;
+  }
+
+  .journey-figure {
+    width: min(70%, 34vh);
+    width: min(70%, 34svh);
+  }
+
+  .journey-visual {
+    --ring-size: min(42vh, 86vw);
+    --ring-size: min(42svh, 86vw);
+  }
+
+  .journey-copy h3 {
+    margin: 0.3rem 0 0.5rem;
+    font-size: 2rem;
+  }
+
+  .journey-copy p {
+    font-size: 0.92rem;
+  }
+
+  /* En móvil la lista de etapas se vuelve una fila de números. */
+  .journey-steps {
+    flex-direction: row;
+    justify-content: space-between;
+    /* Deja libre la esquina del botón flotante de WhatsApp. */
+    padding-right: 3.75rem;
+  }
+
+  .journey-steps button {
+    justify-content: center;
+    padding: 0.5rem 0;
+    font-size: 0;
+  }
+
+  /* En celular la lista de etapas es una fila de puntos. */
+  .journey-steps button {
+    border-bottom: 0;
+  }
+
+  .journey-dot {
+    width: 0.6rem;
+    height: 0.6rem;
+  }
+
+  .journey-progress {
+    right: 1.25rem;
+    bottom: 1rem;
+    left: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey,
+  .journey-scene,
+  .journey-figure,
+  .journey-copy-inner {
+    animation: none;
+    transition: none;
+  }
+}
